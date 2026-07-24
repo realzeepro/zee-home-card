@@ -3902,15 +3902,15 @@ class CasaLuna extends HTMLElement {
     const isDawn = isDay && bell < 0.22 && sun.t < 0.5;
     const isDusk = isDay && bell < 0.22 && sun.t >= 0.5;
     const cond = this._wxCondition();
-    if (cond === 'partlycloudy') return isDay ? 'casa-luna-partlycloudy-day' : 'casa-luna-partlycloudy-night';
-    if (cond === 'cloudy') return isDay ? 'casa-luna-cloudy-day' : 'casa-luna-cloudy-night';
-    if (cond === 'thunderstorm') return 'casa-luna-thunderstorm';
-    if (cond === 'rainy') return isDay ? 'casa-luna-rainy-day' : 'casa-luna-rainy-night';
-    if (cond === 'snowy') return 'casa-luna-snowy-day';
-    if (cond === 'fog') return 'casa-luna-fog-day';
-    if (isDawn) return 'casa-luna-clear-dawn';
-    if (isDusk) return 'casa-luna-clear-dusk';
-    return isDay ? 'casa-luna-clear-day' : 'casa-luna-clear-night';
+    if (cond === 'partlycloudy') return isDay ? 'zee-home-card-partlycloudy-day' : 'zee-home-card-partlycloudy-night';
+    if (cond === 'cloudy') return isDay ? 'zee-home-card-cloudy-day' : 'zee-home-card-cloudy-night';
+    if (cond === 'thunderstorm') return 'zee-home-card-thunderstorm';
+    if (cond === 'rainy') return isDay ? 'zee-home-card-rainy-day' : 'zee-home-card-rainy-night';
+    if (cond === 'snowy') return 'zee-home-card-snowy-day';
+    if (cond === 'fog') return 'zee-home-card-fog-day';
+    if (isDawn) return 'zee-home-card-clear-dawn';
+    if (isDusk) return 'zee-home-card-clear-dusk';
+    return isDay ? 'zee-home-card-clear-day' : 'zee-home-card-clear-night';
   }
   _setBackground(force) {
     const key = this._bgVariantKey();
@@ -3921,7 +3921,7 @@ class CasaLuna extends HTMLElement {
     const hideEl = this._q(this._bgFlip ? '#bgB' : '#bgA');
     const img = new Image();
     img.onload = () => { showEl.src = img.src; showEl.style.opacity = 1; hideEl.style.opacity = 0; };
-    img.onerror = () => { showEl.src = `${BASE}/casa-luna.png`; showEl.style.opacity = 1; hideEl.style.opacity = 0; };
+    img.onerror = () => { showEl.src = `${BASE}/zee-home-card.png`; showEl.style.opacity = 1; hideEl.style.opacity = 0; };
     img.src = `${BASE}/${key}.png`;
     this._bgFlip = !this._bgFlip;
     // —— weather system: stars (night) + particle overlay (by condition) ——
