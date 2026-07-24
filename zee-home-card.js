@@ -1034,6 +1034,45 @@ class CasaLuna extends HTMLElement {
   }
   _fmt(v) { return this._dec(v); }
 
+  /* format a raw MB/s or bytes/s sensor into human-readable speed (KB/s, MB/s, etc.) */
+  _fmtSpeed(id) {
+    const raw = this._num(id, NaN);
+    if (!Number.isFinite(raw)) return '--';
+    const unit = (this._attr(id, 'unit_of_measurement') || '').toLowerCase();
+    let bytesPerSec;
+    if (unit.includes('mb') || unit === 'mb/s') bytesPerSec = raw * 1048576;
+    else if (unit.includes('gb') || unit === 'gb/s') bytesPerSec = raw * 1073741824;
+    else if (unit.includes('kb') || unit === 'kb/s') bytesPerSec = raw * 1024;
+    else if (unit.includes('b/s') || unit === 'bytes/s' || unit === 'bps') bytesPerSec = raw;
+    else bytesPerSec = raw * 1048576;
+    if (bytesPerSec >= 1073741824) return `${(bytesPerSec / 1073741824).toFixed(1)} GB/s`;
+    if (bytesPerSec >= 1048576) return `${(bytesPerSec / 1048576).toFixed(1)} MB/s`;
+    if (bytesPerSec >= 1024) return `${(bytesPerSec / 1024).toFixed(1)} KB/s`;
+    return `${Math.round(bytesPerSec)} B/s`;
+  }
+
+  /* parse an entity state that may be a datetime string ("July 16, 2026 at 7:31 PM")
+     or a Unix timestamp, and return a human-readable duration like "4d 12h" */
+  _fmtUptime(id) {
+    const raw = this._st(id);
+    if (!raw) return '--';
+    let ms = NaN;
+    if (/^\d{10,13}$/.test(raw.trim())) {
+      ms = Number(raw) * (raw.length <= 10 ? 1000 : 1);
+    } else {
+      const d = new Date(raw);
+      if (!isNaN(d.getTime())) ms = d.getTime();
+    }
+    if (isNaN(ms)) return raw;
+    const sec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+    const days = Math.floor(sec / 86400);
+    const hrs = Math.floor((sec % 86400) / 3600);
+    const mins = Math.floor((sec % 3600) / 60);
+    if (days > 0) return `${days}d ${hrs}h`;
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    return `${mins}m`;
+  }
+
   /* The 7 customizable tiles → the config key the editor edits for each.
      A tile shows raw (entity's own unit/sign) when its entity is set, else default kWh. */
   /* ═══════════════════════ TILE / ENTITY CONFIG HELPERS ═══════════════════════ */
@@ -3159,6 +3198,12 @@ class CasaLuna extends HTMLElement {
   _viewSystem() {
     const c = this.config;
     const bf = (sysKey, mainKey) => (c[sysKey] && this._stateObj(c[sysKey])) ? c[sysKey] : (c[mainKey] || '');
+    const _sysTile = (icon, label, entId, formatted) => {
+      const has = !!entId;
+      return `<div class="pw-mtile" ${has ? `data-more="${esc(entId)}" style="cursor:pointer"` : ''}>
+        <div class="mi">${icon}</div><div class="ml">${esc(label)}</div>
+        <div class="mv${!has ? ' off' : ''}">${esc(formatted)}</div></div>`;
+    };
     return this._wHead('INVERTER')
       + this._wGrid(4,
         this._wTile('🌡️', 'Inverter Temp', bf('sys_inv_temp', 'inv_temp'), '°C')
@@ -3170,16 +3215,16 @@ class CasaLuna extends HTMLElement {
         this._wTile('💾', 'CPU', c.sys_cpu || '', '%')
         + this._wTile('🧠', 'Memory', c.sys_memory || '', '%')
         + this._wTile('💿', 'Disk', c.sys_disk || '', '%')
-        + this._wTile('⏱️', 'Uptime', c.sys_uptime || ''))
+        + _sysTile('⏱️', 'Uptime', c.sys_uptime || '', this._fmtUptime(c.sys_uptime || '')))
       + this._wGrid(3,
         this._wTile('🌡️', 'Core 1 Temp', c.sys_core1_temp || '', '°C')
         + this._wTile('🌡️', 'Core 2 Temp', c.sys_core2_temp || '', '°C')
         + this._wTile('🌡️', 'Package Temp', c.sys_package_temp || '', '°C'))
       + this._wGrid(4,
-        this._wTile('📥', 'eth0 RX', c.sys_eth0_rx || '')
-        + this._wTile('📤', 'eth0 TX', c.sys_eth0_tx || '')
-        + this._wTile('📥', 'wlan0 RX', c.sys_wlan0_rx || '')
-        + this._wTile('📤', 'wlan0 TX', c.sys_wlan0_tx || ''));
+        _sysTile('📥', 'eth0 RX', c.sys_eth0_rx || '', this._fmtSpeed(c.sys_eth0_rx || ''))
+        + _sysTile('📤', 'eth0 TX', c.sys_eth0_tx || '', this._fmtSpeed(c.sys_eth0_tx || ''))
+        + _sysTile('📥', 'wlan0 RX', c.sys_wlan0_rx || '', this._fmtSpeed(c.sys_wlan0_rx || ''))
+        + _sysTile('📤', 'wlan0 TX', c.sys_wlan0_tx || '', this._fmtSpeed(c.sys_wlan0_tx || '')));
   }
 
 
