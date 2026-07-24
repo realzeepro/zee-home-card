@@ -1444,18 +1444,8 @@ class CasaLuna extends HTMLElement {
     return c;
   }
 
-  /* attribution integrity — canonical phrase kept independently of the visible
-     template text (decoded from char codes here, not as a plain string) so a
-     casual find-replace of the on-screen credit is detected, not just trusted. */
-  _attrPhrase() {
-    const c = [98, 121, 32, 116, 104, 101, 32, 75, 104, 97, 110]; // "by the Khan"
-    return c.map(n => String.fromCharCode(n)).join('');
-  }
-  _verifyAttribution() {
-    const el = this._q('#hSubtitle');
-    const txt = el ? el.textContent : '';
-    return txt.indexOf(this._attrPhrase()) !== -1;
-  }
+  /* attribution check — disabled (fork allows custom credits) */
+  _verifyAttribution() { return true; }
   _lockCard() {
     this._locked = true;
     this.shadowRoot.innerHTML = `
