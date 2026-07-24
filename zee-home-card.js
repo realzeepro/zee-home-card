@@ -765,7 +765,7 @@ class CasaLuna extends HTMLElement {
     };
   }
 
-  static getConfigElement() { return document.createElement('casa-luna-editor'); }
+  static getConfigElement() { return document.createElement('zee-home-card-editor'); }
   /* ═══════════════════════ LIFECYCLE & HASS ═══════════════════════ */
   getCardSize() { return 8; }
 
