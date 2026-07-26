@@ -38,6 +38,13 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 ### Summary Tiles — spread wider
 - `SL.invt.xs` changed from `[687, 823, 959]` to `[620, 770, 920]`
 
+### Inverter Card CSS Refactor — vertical centre alignment
+- Donut SVG: `top:33px` (was 18) — vertically centred in 136px inv_right box
+- Name: `top:12px` (was 6) — `line-height:1` for consistent baseline
+- Temps: `top:58px` (was 28) — centre-aligned with donut centre line (67.5px)
+- Error: `top:63px` (was 46), `left:78px` (was 76) — `line-height:1`, aligned with donut centre
+- All text spans now use `line-height:1` to eliminate cross-element baseline drift
+
 ### INV LOAD Reposition — far left vertical stack
 - Donut SVG reduced from 115px to 70px, moved to top-left of inv_right box
 - Inverter name, Radiator Temp, and error status stacked vertically below the donut (was: horizontal row to the right)
