@@ -664,7 +664,7 @@ class CasaLuna extends HTMLElement {
       thresh_endurance_low: 2, thresh_endurance_crit: 1,
       /* —— additive (new in casa-luna) —— */
       title: 'ZEE HOME',
-      background_path: '/local/community/zee-home-card/sky',
+      background_path: 'https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky',
       edge_dim_opacity: 100,
       history_charts: true,
       _show_advanced: false,
@@ -5296,7 +5296,7 @@ class CasaLunaEditor extends HTMLElement {
       divider(),
       numberField('lower_section_offset', 'Flow diagram vertical offset', -80, 80, 1, 'SVG units (− = up)'),
       divider(),
-      textField('background_path', 'Background Image Path', '/local/community/zee-home-card/sky'),
+      textField('background_path', 'Background Image Path (GitHub raw by default — set to /local/community/zee-home-card/sky if you copy the sky folder manually)', 'https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky'),
     ]));
 
     shell.appendChild(section('toggles', '🎚️', 'Toggles', [
