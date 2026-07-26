@@ -38,6 +38,13 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 ### Summary Tiles — spread wider
 - `SL.invt.xs` changed from `[687, 823, 959]` to `[620, 770, 920]`
 
+### v1.2.0 — Gauge 120px, temps 11px + 3px gap
+- Gauge: 120×120px when expanded (phase hidden), 70×70 when collapsed
+- Temp/rad temp: 11px font, 3px gap, vertically centre-aligned with gauge
+- Error: 11px font, right of gauge when expanded, below when collapsed
+- Inverter name: 14px font, centred above gauge
+- All text `line-height:1` for consistent baselines
+
 ### Inverter Card CSS Refactor — vertical centre alignment
 - Donut SVG: `top:33px` (was 18) — vertically centred in 136px inv_right box
 - Name: `top:12px` (was 6) — `line-height:1` for consistent baseline

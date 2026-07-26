@@ -1,4 +1,4 @@
-// v1.1.0 · zee-home-card
+// v1.2.0 · zee-home-card
 /* ════════════════════════════════════════════════════════════════════
    zee-home-card.js — Zee Home Card · based on Casa Luna by The Khan
    Custom element: <zee-home-card>  (renamed to avoid
@@ -1738,7 +1738,7 @@ class CasaLuna extends HTMLElement {
     const tempW = dcSvgLeft - 10;
     const nameLeft = dcSvgLeft + Math.round((gaugeSz - 75) / 2);
     const gCenY = gaugeTop + Math.round(gaugeSz / 2);
-    const tempsTop = gCenY - 10;
+    const tempsTop = gCenY - 12;
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1766,9 +1766,9 @@ class CasaLuna extends HTMLElement {
       <!-- Name above gauge, centred -->
       <div class="val" style="position:absolute;left:${nameLeft}px;top:10px;width:75px;text-align:center;font-size:14px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1">${esc(c.inverter_name || 'GOODWE')}</div>
       <!-- Temps left of gauge, vertically centred -->
-      <div style="position:absolute;left:6px;top:${tempsTop}px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden;line-height:1">
-        <span id="invStatus" style="font-size:10px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
-        <span id="invRadTemp" style="font-size:10px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      <div style="position:absolute;left:6px;top:${tempsTop}px;width:${tempW}px;display:flex;flex-direction:column;gap:3px;overflow:hidden;line-height:1">
+        <span id="invStatus" style="font-size:11px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
+        <span id="invRadTemp" style="font-size:11px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
       </div>
       <!-- Donut SVG, vertically centred -->
       <svg style="position:absolute;left:${dcSvgLeft}px;top:${gaugeTop}px;width:${gaugeSz}px;height:${gaugeSz}px" viewBox="0 0 115 115">
@@ -1794,7 +1794,7 @@ class CasaLuna extends HTMLElement {
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
       <!-- Error — right of gauge when expanded, below when collapsed -->
-      <span id="invErr" style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:${gCenY+37}px;width:75px;text-align:center`:`left:${dcSvgLeft+125}px;top:60px`};font-size:10px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1"></span>
+      <span id="invErr" style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:${gCenY+37}px;width:75px;text-align:center`:`left:${dcSvgLeft+125}px;top:60px`};font-size:11px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1"></span>
     </div>`;
 
     const invTileDefs = [
