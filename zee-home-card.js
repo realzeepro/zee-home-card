@@ -708,6 +708,7 @@ class CasaLuna extends HTMLElement {
       auto_extra_4_entity: '', auto_extra_4_name: '', auto_extra_5_entity: '', auto_extra_5_name: '', auto_extra_6_entity: '', auto_extra_6_name: '',
       /* ── ENERGY view ── (monitoring pre-filled from GoodWe/Tuya; control slots for later) */
       en_pv1: '', en_pv2: '',
+      en_total_pv: '', en_heavy_load: '', en_battery_power: '',
       en_grid_power: '', en_load: '',
       en_backup: '', en_work_mode: '',
       en_backup_supply: '', en_ems_mode: '', en_op_mode: '', en_export_switch: '', en_export_limit: '',
@@ -2469,6 +2470,15 @@ class CasaLuna extends HTMLElement {
       <div class="pw-tgl ${on ? 'on' : ''}" ${has ? `data-toggle="${esc(entId)}"` : 'style="opacity:.4"'}><div class="kn"></div></div></div>`;
   }
 
+  /* computed-power TILE: same visual as _wTile but takes a raw watt value instead of
+       an entity ID — used for Heavy Load which is derived from grid + battery flow. */
+  _wComputedTile(icon, label, watts, unit = '') {
+    const val = Number.isFinite(watts) ? this._powerStr(watts) : '--';
+    return `<div class="pw-mtile" style="cursor:default">
+      <div class="mi">${icon}</div><div class="ml">${esc(label)}</div>
+      <div class="mv${Number.isFinite(watts) ? '' : ' off'}">${esc(val)}</div></div>`;
+  }
+
   /* smart-plug tile: name + optional live power + on/off toggle */
   _wPlugTile(label, switchId, powerId) {
     const has = !!switchId;
@@ -3034,9 +3044,14 @@ class CasaLuna extends HTMLElement {
       + this._wGrid(4,
         this._wTile('☀️', 'PV1', bf('en_pv1', 'pv1_power'), 'W', true)
         + this._wTile('☀️', 'PV2', bf('en_pv2', 'pv2_power'), 'W', true)
+        + this._wTile('☀️', 'Total PV', bf('en_total_pv', 'pv_total_power'), 'W', true)
         + this._wTile('🏭', 'Grid', bf('en_grid_power', 'grid_active_power'), 'W', true)
         + this._wTile('🏠', 'Load', bf('en_load', 'consump'), 'W', true)
         + this._wTile('🔋', 'Backup', c.en_backup || '', 'W', true)
+        + (c.en_heavy_load
+            ? this._wTile('🏋️', 'Heavy Load', c.en_heavy_load, 'W', true)
+            : this._wComputedTile('🏋️', 'Heavy Load', this._heavyLoadW()))
+        + this._wTile('🔋', 'Battery Power', bf('en_battery_power', 'battery_power'), 'W', true)
         + this._wTile('⚙️', 'Mode', bf('en_work_mode', 'inverter_state')))
       + this._wHead('Inverter Controls')
       + this._wGrid(3,
@@ -4284,6 +4299,16 @@ class CasaLuna extends HTMLElement {
       : this._watts(c.consump);
   }
 
+  /* Heavy Load = portion of house load drawn from grid import + battery discharge.
+       Represents the power supplied by "high-power" (non-PV) sources. Derived from
+       the same signed power-flow conventions used by _gridNetW() and _updateFlows(). */
+  _heavyLoadW() {
+    const c = this.config;
+    const gW = this._gridNetW();
+    const bP = this._watts(c.battery_power) * (c.invert_battery_power ? -1 : 1);
+    return Math.max(gW, 0) + Math.max(bP, 0);
+  }
+
   _updateFlows() {
     const c = this.config;
       const bP  = this._watts(c.battery_power) * (c.invert_battery_power ? -1 : 1);
@@ -5482,8 +5507,11 @@ class CasaLunaEditor extends HTMLElement {
     shell.appendChild(section('nav_energy', '⚡', 'Energy View', [
       info('Monitoring rows + GoodWe inverter controls. Leave blank to show a dimmed slot.'),
       picker('en_pv1', 'PV1 Power', true), picker('en_pv2', 'PV2 Power', true),
+      picker('en_total_pv', 'Total PV', true),
       picker('en_grid_power', 'Grid Power', true), picker('en_load', 'House Load', true),
-      picker('en_backup', 'Backup Load', true), picker('en_work_mode', 'Work Mode', true),
+      picker('en_backup', 'Backup Load', true), picker('en_heavy_load', 'Heavy Load (optional — computed if empty)', true),
+      picker('en_battery_power', 'Battery Power', true),
+      picker('en_work_mode', 'Work Mode', true),
       divider(),
       picker('en_backup_supply', 'Backup supply (switch)', true),
       picker('en_ems_mode', 'EMS mode (select)', true),
