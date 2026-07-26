@@ -449,7 +449,7 @@ const LANG = {
 const SL = {
   nav:  { x:20, w:211, h:77, tops:[146,229,312,395,478,561,644,727,810] },
   r_cyl:[1113,92,152,288], r_stats:[1275,162,208,237], r_mode:[1275,25,208,130],
-  r_pvtile:[1113,395,369,50], r_ev:[1113,447,369,50], r_cons:[1113,498,369,123], r_prod:[1113,623,369,123], r_events:[1113,748,369,141],
+  r_pvtile:[1113,410,369,50], r_ev:[1113,462,369,50], r_cons:[1113,513,369,123], r_prod:[1113,638,369,123], r_events:[1113,763,369,141],
   pv:[323,575,360,33], pwr:[720,575,355,33],
   stat_cont:[297,619,799,131],
   stat:{ y:630,h:107,w:180,xs:[309,508,707,906] },
@@ -1910,12 +1910,12 @@ class CasaLuna extends HTMLElement {
     const [mx, my, mw, mh] = SL.r_mode;
     const mode = `
     <div id="statusIcons"></div>
-    <div class="box" style="left:${mx}px;top:${my}px;width:${mw}px;height:${mh}px">
+    <div class="box" style="left:${mx}px;top:${my}px;width:${mw}px;height:${mh}px;overflow:hidden">
       <div class="lbl" style="position:absolute;left:16px;top:11px">MODE</div>
       <div class="val" id="modeVal" style="position:absolute;left:16px;top:31px;font-size:${Number(c.sz_mode) || 17}px;color:#22c3ff">--</div>
       <div style="position:absolute;left:14px;right:14px;top:62px;height:1px;background:rgba(150,200,255,.18)"></div>
-      <div style="position:absolute;left:16px;right:14px;top:74px;display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
-        <span id="invStateLbl" style="font-size:11px;color:#7fa3c4;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">${esc(c.label_inverter_state || 'INV STATE')}</span>
+      <div style="position:absolute;left:16px;right:14px;top:74px;bottom:8px;overflow-y:auto;display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
+        <span id="invStateLbl" style="font-size:11px;color:#7fa3c4;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0">${esc(c.label_inverter_state || 'INV STATE')}</span>
         <span class="val" id="invState" data-entity="${c.inverter_state || ''}" style="font-size:${Number(c.sz_invstate) || 13}px;font-weight:650;color:#39d353;text-align:right;line-height:1.35;overflow-wrap:anywhere;min-width:0">--</span>
       </div>
     </div>`;
