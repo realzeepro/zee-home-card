@@ -1346,8 +1346,8 @@ class CasaLuna extends HTMLElement {
       .stattile .val { font-family:'Segoe UI',Roboto,'Helvetica Neue',system-ui,sans-serif; }
       /* nav modal: centered overlay inside the card. Clamps to viewport and scrolls
           when content is tall. The scaler transform handles responsive sizing. */
-      .detail { position:absolute; left:10%; top:8%;
-        width:80%; height:84%;
+      .detail { position:absolute; left:18%; top:8%;
+        width:64%; height:84%;
         display:none; z-index:40;
         background:linear-gradient(135deg,rgba(12,28,52,.975),rgba(8,18,38,.985));
         border:2px solid rgba(0,200,255,.55);
