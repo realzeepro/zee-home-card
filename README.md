@@ -30,7 +30,9 @@ resources:
 
 ### Sky Background Images
 
-The `sky/` folder with 14 PNG background images is bundled in the repository and **downloaded automatically by HACS** — no manual placement needed. The expected structure after HACS installs:
+The `sky/` folder contains 14 PNG background images hosted in the repo. Since HACS plugin-type repositories only download the single JavaScript file, the card loads sky images from **GitHub's raw CDN** by default. No manual placement needed.
+
+The expected directory structure if you prefer local hosting:
 
 ```
 /config/www/community/zee-home-card/
@@ -52,6 +54,8 @@ The `sky/` folder with 14 PNG background images is bundled in the repository and
     ├── zee-home-card-fog-day.png
     └── zee-home-card-snowy-night.png
 ```
+
+To switch to local loading, set `background_path` to `/local/community/zee-home-card/sky` in the editor and copy the `sky/` folder manually.
 
 ---
 
@@ -88,7 +92,7 @@ title: 'ZEE HOME'
 The System View has been redesigned with two sections:
 
 ### Inverter Section (4 tiles)
-- State, Error, Temp, Lifetime
+- Inverter Temp, Board Temp, Mode, Running Hours
 
 ### Server Section (3 rows)
 - **Row 1:** CPU, Memory, Disk, Uptime
@@ -196,19 +200,24 @@ All keys are configurable through the visual editor. YAML equivalents are listed
 
 | Key | Default | Description |
 |---|---|---|
-| `sys_inverter_state` | `''` | Inverter state |
-| `sys_inverter_error` | `''` | Inverter error code |
-| `sys_inverter_temp` | `''` | Inverter temperature |
-| `sys_inverter_lifetime` | `''` | Lifetime energy |
-| `sys_server_cpu` | `''` | Server CPU usage |
-| `sys_server_mem` | `''` | Server memory usage |
-| `sys_server_disk` | `''` | Server disk usage |
-| `sys_server_uptime` | `''` | Server uptime (datetime string → `Xd Xh`) |
+| `sys_inv_temp` | `''` | Inverter temperature |
+| `sys_board_temp` | `''` | Board temperature |
+| `sys_work_mode` | `''` | Inverter work mode |
+| `sys_running_hours` | `''` | Total running hours |
+| `sys_cpu` | `''` | Server CPU usage |
+| `sys_memory` | `''` | Server memory usage |
+| `sys_disk` | `''` | Server disk usage |
+| `sys_uptime` | `''` | Server uptime (datetime string → `Xd Xh`) |
 | `sys_core1_temp` | `''` | Core 1 temperature |
 | `sys_core2_temp` | `''` | Core 2 temperature |
 | `sys_package_temp` | `''` | Package temperature |
 | `sys_eth0_rx` / `sys_eth0_tx` | `''` | ETH0 receive/transmit (raw MB/s) |
 | `sys_wlan0_rx` / `sys_wlan0_tx` | `''` | WLAN0 receive/transmit (raw MB/s) |
+| `sys_c3_status` | `''` | C3 status |
+| `sys_gas` | `''` | Gas level |
+| `sys_lux` | `''` | Light level |
+| `sys_wifi` | `''` | WiFi signal |
+| `sys_bluetooth` | `''` | Bluetooth |
 
 ### Toggles
 
@@ -250,9 +259,9 @@ Climate, Security, Lighting, and Automation each have:
 - `auto_discover_<view>` toggle (default `false`)
 - 6 `<view>_extra_N_entity` + `<view>_extra_N_name` free slots
 
-Smart Plugs has 6 `plug_N_entity` + `plug_N_name` + `plug_N_power` slots.
+Smart Plugs has 6 `plug_N_entity` + `plug_N_name` + `plug_N_power` + `plug_N_voltage` slots.
 
-Battery View has its own `bat_*` entities — each falls back to the matching main-face `battery_*` entity if left blank.
+Battery View has its own `bat_*` entities (including `bat_soh`, `bat_index`, `bat_bms_version`) — each falls back to the matching main-face `battery_*` entity if left blank.
 
 System and Energy views are populated by their own dedicated editor sections (`sys_*`, `en_*` keys).
 
@@ -318,7 +327,7 @@ Network speed values are displayed in auto-scaled units (KB/s → MB/s → GB/s)
 - Sky selection requires a `weather_entity`; without it the card falls back to the clear day/night variant.
 - Attribution DRM from the original Casa Luna has been removed.
 - Custom element names: `zee-home-card` and `zee-home-card-editor`.
-- `background_path` defaults to `/local/community/zee-home-card/sky`.
+- `background_path` defaults to `https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky` so sky images load via HACS without manual folder copy. Set to a local path for offline use.
 
 ---
 
