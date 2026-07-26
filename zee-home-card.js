@@ -1732,8 +1732,13 @@ class CasaLuna extends HTMLElement {
        vacated space. Layout: name above donut, temps left, errors right. */
     const irX = c._show_phase ? IR[0] : IB[0];
     const irW = IR[2] + (IR[0] - irX);
-    const dcSvgLeft = c._show_phase ? 64 : 92;
+    const gaugeSz = c._show_phase ? 70 : 120;
+    const gaugeTop = c._show_phase ? 33 : 15;
+    const dcSvgLeft = c._show_phase ? 64 : 100;
     const tempW = dcSvgLeft - 10;
+    const nameLeft = dcSvgLeft + Math.round((gaugeSz - 75) / 2);
+    const gCenY = gaugeTop + Math.round(gaugeSz / 2);
+    const tempsTop = gCenY - 10;
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1758,15 +1763,15 @@ class CasaLuna extends HTMLElement {
       </div>
     </div>
     <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;overflow:hidden;background:var(--cl-box-bg,rgba(0,0,0,.35))">
-      <!-- Name above donut, centred -->
-      <div class="val" style="position:absolute;left:${dcSvgLeft}px;top:12px;width:75px;text-align:center;font-size:10px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1">${esc(c.inverter_name || 'GOODWE')}</div>
-      <!-- Temps left of donut, vertically centred with gauge -->
-      <div style="position:absolute;left:6px;top:59px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden;line-height:1">
-        <span id="invStatus" style="font-size:9px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
-        <span id="invRadTemp" style="font-size:9px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      <!-- Name above gauge, centred -->
+      <div class="val" style="position:absolute;left:${nameLeft}px;top:10px;width:75px;text-align:center;font-size:14px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1">${esc(c.inverter_name || 'GOODWE')}</div>
+      <!-- Temps left of gauge, vertically centred -->
+      <div style="position:absolute;left:6px;top:${tempsTop}px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden;line-height:1">
+        <span id="invStatus" style="font-size:10px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
+        <span id="invRadTemp" style="font-size:10px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
       </div>
       <!-- Donut SVG, vertically centred -->
-      <svg style="position:absolute;left:${dcSvgLeft}px;top:31px;width:75px;height:75px" viewBox="0 0 115 115">
+      <svg style="position:absolute;left:${dcSvgLeft}px;top:${gaugeTop}px;width:${gaugeSz}px;height:${gaugeSz}px" viewBox="0 0 115 115">
         ${(() => {
           const cx = 57.5, cy = 57.5, r = 40, sw = 5.5;
           const nBlk = 6, gapDeg = 12;
@@ -1788,8 +1793,8 @@ class CasaLuna extends HTMLElement {
         <text x="57.5" y="48" font-size="14" fill="#a8cae6" text-anchor="middle">${this._t("INV LOAD")}</text>
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
-      <!-- Error — right of donut when expanded, below donut when collapsed -->
-      <span id="invErr" style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:110px;width:75px;text-align:center`:`left:${dcSvgLeft+78}px;top:64px`};font-size:9px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1"></span>
+      <!-- Error — right of gauge when expanded, below when collapsed -->
+      <span id="invErr" style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:${gCenY+37}px;width:75px;text-align:center`:`left:${dcSvgLeft+125}px;top:60px`};font-size:10px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1"></span>
     </div>`;
 
     const invTileDefs = [
