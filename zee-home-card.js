@@ -1849,7 +1849,7 @@ class CasaLuna extends HTMLElement {
         let h = `<div style="position:absolute;left:13px;top:${topY}px;height:${rowH}px;display:flex;align-items:center;font-size:10px;color:#a8cae6;letter-spacing:.04em;text-transform:uppercase">${rowLabel}</div>`;
         for (let i = 0; i < nActive; i++) {
           const sx = 13 + labelW + i * slotW;
-          h += `<div id="${idPrefix}${i}" style="position:absolute;left:${sx}px;width:${slotW}px;top:${topY}px;height:${rowH}px;display:flex;align-items:center;justify-content:center;font-size:${Number(c.sz_pvtile)||14}px;font-weight:700;color:${col}">--</div>`;
+          h += `<div id="${idPrefix}${i}" style="position:absolute;left:${sx}px;width:${slotW}px;top:${topY}px;height:${rowH}px;display:flex;align-items:center;justify-content:center;font-size:${Number(c.sz_pvtile)||14}px;font-weight:700;color:${col};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">--</div>`;
         }
         return h;
       };
@@ -1916,7 +1916,7 @@ class CasaLuna extends HTMLElement {
       <div style="position:absolute;left:14px;right:14px;top:62px;height:1px;background:rgba(150,200,255,.18)"></div>
       <div style="position:absolute;left:16px;right:14px;top:74px;display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
         <span id="invStateLbl" style="font-size:11px;color:#7fa3c4;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">${esc(c.label_inverter_state || 'INV STATE')}</span>
-        <span class="val" id="invState" data-entity="${c.inverter_state || ''}" style="font-size:${Number(c.sz_invstate) || 13}px;font-weight:650;color:#39d353;text-align:right;line-height:1.35;word-break:break-word">--</span>
+        <span class="val" id="invState" data-entity="${c.inverter_state || ''}" style="font-size:${Number(c.sz_invstate) || 13}px;font-weight:650;color:#39d353;text-align:right;line-height:1.35;overflow-wrap:anywhere;min-width:0">--</span>
       </div>
     </div>`;
     const [cx0, cy0, cw0, ch0] = SL.r_cyl;
@@ -2007,9 +2007,9 @@ class CasaLuna extends HTMLElement {
       const dualRow = id === 'bCtmp' || id === 'bCv';
       const lblSz = dualRow ? Math.max(9, baseLblSz - 2) : baseLblSz;
       const valSz = dualRow ? Math.max(11, baseSz - 5) : baseSz;
-      return `<div${tap} style="position:absolute;left:16px;right:14px;top:${midY - 9}px;display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+      return `<div${tap} style="position:absolute;left:16px;right:14px;top:${midY - 9}px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <span id="${id}Lbl" style="font-size:${lblSz}px;color:#a8cae6;white-space:nowrap;flex-shrink:0">${esc(l)}</span>
-        <span class="val" id="${id}" style="font-size:${valSz}px;color:${vc};text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">--</span>
+        <span class="val" id="${id}" style="font-size:${valSz}px;color:${vc};text-align:right;line-height:1.3;overflow-wrap:anywhere;min-width:0">--</span>
       </div>`;
     }).join('');
     const battStats = `
