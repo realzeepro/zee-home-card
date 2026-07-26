@@ -1442,7 +1442,7 @@ class CasaLuna extends HTMLElement {
         text-transform:uppercase; margin:14px 0 8px; opacity:.85; }
       .pw-head:first-child { margin-top:0; }
       /* camera tiles */
-      .pw-cams { display:flex; gap:12px; margin-bottom:14px; }
+      .pw-cams { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
       .pw-cam { flex:1; aspect-ratio:16/10; background:rgba(0,0,0,.55); border:1px solid rgba(0,200,255,.3);
         border-radius:10px; overflow:hidden; position:relative; }
       .pw-cam iframe { width:100%; height:100%; border:none; }
