@@ -694,9 +694,9 @@ class CasaLuna extends HTMLElement {
       clim_extra_1_entity: '', clim_extra_1_name: '', clim_extra_2_entity: '', clim_extra_2_name: '',
       clim_extra_3_entity: '', clim_extra_3_name: '', clim_extra_4_entity: '', clim_extra_4_name: '',
       clim_extra_5_entity: '', clim_extra_5_name: '', clim_extra_6_entity: '', clim_extra_6_name: '',
-      plug_1_entity: '', plug_1_name: '', plug_1_power: '', plug_2_entity: '', plug_2_name: '', plug_2_power: '',
-      plug_3_entity: '', plug_3_name: '', plug_3_power: '', plug_4_entity: '', plug_4_name: '', plug_4_power: '',
-      plug_5_entity: '', plug_5_name: '', plug_5_power: '', plug_6_entity: '', plug_6_name: '', plug_6_power: '',
+      plug_1_entity: '', plug_1_name: '', plug_1_power: '', plug_1_voltage: '', plug_2_entity: '', plug_2_name: '', plug_2_power: '', plug_2_voltage: '',
+      plug_3_entity: '', plug_3_name: '', plug_3_power: '', plug_3_voltage: '', plug_4_entity: '', plug_4_name: '', plug_4_power: '', plug_4_voltage: '',
+      plug_5_entity: '', plug_5_name: '', plug_5_power: '', plug_5_voltage: '', plug_6_entity: '', plug_6_name: '', plug_6_power: '', plug_6_voltage: '',
       sec_flame_name: '', sec_gas_analog_name: '', sec_gas_digital_name: '', sec_motion_name: '', sec_door1_name: '', sec_window1_name: '',
       sec_extra_1_entity: '', sec_extra_1_name: '', sec_extra_2_entity: '', sec_extra_2_name: '', sec_extra_3_entity: '', sec_extra_3_name: '',
       sec_extra_4_entity: '', sec_extra_4_name: '', sec_extra_5_entity: '', sec_extra_5_name: '', sec_extra_6_entity: '', sec_extra_6_name: '',
@@ -722,6 +722,7 @@ class CasaLuna extends HTMLElement {
       bat_temp1: '', bat_temp2: '',
       bat_mos: '',
       bat_charge_enable: '', bat_discharge_enable: '', bat_force_charge: '', bat_soc_limit: '',
+      bat_soh: '', bat_index: '', bat_bms_version: '',
       /* ── AUTOMATION view ── (relays + Alexa pre-filled; scenes/automations/timers slots) */
       auto_scene_night: '', auto_scene_morning: '', auto_scene_away: '',
       auto_scene_movie: '', auto_scene_party: '', auto_scene_home: '',
@@ -742,7 +743,7 @@ class CasaLuna extends HTMLElement {
       sys_inv_temp: '', sys_work_mode: '',
       sys_c3_status: '',
       sys_board_temp: '', sys_gas: '', sys_lux: '',
-      sys_wifi: '', sys_bluetooth: '', sys_grid_meter: '',
+      sys_wifi: '', sys_bluetooth: '', sys_grid_meter: '', sys_running_hours: '',
       _demo_mode: false,
       calendar_entities: [],
       sys_cpu: '', sys_memory: '', sys_disk: '', sys_uptime: '',
@@ -2479,8 +2480,8 @@ class CasaLuna extends HTMLElement {
       <div class="mv${Number.isFinite(watts) ? '' : ' off'}">${esc(val)}</div></div>`;
   }
 
-  /* smart-plug tile: name + optional live power + on/off toggle */
-  _wPlugTile(label, switchId, powerId) {
+  /* smart-plug tile: name + optional live power + optional voltage + on/off toggle */
+  _wPlugTile(label, switchId, powerId, voltageId) {
     const has = !!switchId;
     const on = has && ['on', 'open', 'playing'].includes(String(this._st(switchId)).toLowerCase());
     let pw = '';
@@ -2489,8 +2490,14 @@ class CasaLuna extends HTMLElement {
       const txt = Number.isFinite(n) ? `${this._decEnt(powerId)} ${esc(this._attr(powerId, 'unit_of_measurement') || 'W')}` : '--';
       pw = `<div class="tl" style="color:#5bc8ff;font-weight:700;font-size:13px;margin-top:1px">${txt}</div>`;
     }
+    let volt = '';
+    if (voltageId) {
+      const n = this._num(voltageId, NaN);
+      const txt = Number.isFinite(n) ? `${this._decEnt(voltageId)} ${esc(this._attr(voltageId, 'unit_of_measurement') || 'V')}` : '--';
+      volt = `<div class="tl" style="color:#ffb45a;font-weight:600;font-size:12px">${txt}</div>`;
+    }
     return `<div class="pw-ttile">
-      <div class="ti">🔌</div><div class="tl">${esc(label)}</div>${pw}
+      <div class="ti">🔌</div><div class="tl">${esc(label)}</div>${pw}${volt}
       <div class="pw-tgl ${on ? 'on' : ''}" ${has ? `data-toggle="${esc(switchId)}"` : 'style="opacity:.4"'}><div class="kn"></div></div></div>`;
   }
 
@@ -3083,7 +3090,7 @@ class CasaLuna extends HTMLElement {
     const c = this.config;
     const plugs = [1, 2, 3, 4, 5, 6].map(n => {
       const id = c[`plug_${n}_entity`];
-      return id ? this._wPlugTile(c[`plug_${n}_name`] || this._name(id), id, c[`plug_${n}_power`]) : '';
+      return id ? this._wPlugTile(c[`plug_${n}_name`] || this._name(id), id, c[`plug_${n}_power`], c[`plug_${n}_voltage`]) : '';
     }).filter(Boolean).join('');
     return plugs
       ? this._wHead('Smart Plugs') + this._wGrid(3, plugs)
@@ -3106,7 +3113,10 @@ class CasaLuna extends HTMLElement {
         + this._wTile('📊', 'Power', bf('bat_power', 'battery_power'), 'W', true)
         + this._wTile('⏳', 'Remain', c.bat_remain || '', 'Ah')
         + this._wTile('🔺', 'Cell Max', bf('bat_cellmax', 'battery_max_cell'), 'V')
-        + this._wTile('🔻', 'Cell Min', bf('bat_cellmin', 'battery_min_cell'), 'V'))
+        + this._wTile('🔻', 'Cell Min', bf('bat_cellmin', 'battery_min_cell'), 'V')
+        + this._wTile('❤️', 'SOH', c.bat_soh || '', '%')
+        + this._wTile('🔢', 'Index', c.bat_index || '', '')
+        + this._wTile('📋', 'BMS Ver', c.bat_bms_version || '', ''))
       + this._wHead('Temps')
       + this._wGrid(3,
         this._wTile('🌡️', 'Temp 1', bf('bat_temp1', 'battery_temp1'), '°C')
@@ -3230,7 +3240,7 @@ class CasaLuna extends HTMLElement {
         this._wTile('🌡️', 'Inverter Temp', bf('sys_inv_temp', 'inv_temp'), '°C')
         + this._wTile('🌡️', 'Board Temp', c.sys_board_temp || '', '°C')
         + this._wTile('⚙️', 'Mode', bf('sys_work_mode', 'inverter_state'))
-        + this._wTile('🔌', 'Grid kWh', bf('sys_grid_meter', 'grid_active_power')))
+        + this._wTile('⏱️', 'Running hrs', c.sys_running_hours || '', 'h'))
       + this._wHead('SERVER')
       + this._wGrid(4,
         this._wTile('💾', 'CPU', c.sys_cpu || '', '%')
@@ -5541,13 +5551,13 @@ class CasaLunaEditor extends HTMLElement {
     ], { wide: true }));
 
     shell.appendChild(section('nav_plugs', '🔌', 'Smart Plugs View', [
-      info('Smart plugs — pick a switch, optionally name it and add a power sensor. Tap a plug tile to toggle. Empty slots are hidden.'),
-      picker('plug_1_entity', 'Plug 1', true), textField('plug_1_name', 'Plug 1 — name'), picker('plug_1_power', 'Plug 1 — power', true),
-      picker('plug_2_entity', 'Plug 2', true), textField('plug_2_name', 'Plug 2 — name'), picker('plug_2_power', 'Plug 2 — power', true),
-      picker('plug_3_entity', 'Plug 3', true), textField('plug_3_name', 'Plug 3 — name'), picker('plug_3_power', 'Plug 3 — power', true),
-      picker('plug_4_entity', 'Plug 4', true), textField('plug_4_name', 'Plug 4 — name'), picker('plug_4_power', 'Plug 4 — power', true),
-      picker('plug_5_entity', 'Plug 5', true), textField('plug_5_name', 'Plug 5 — name'), picker('plug_5_power', 'Plug 5 — power', true),
-      picker('plug_6_entity', 'Plug 6', true), textField('plug_6_name', 'Plug 6 — name'), picker('plug_6_power', 'Plug 6 — power', true),
+      info('Smart plugs — pick a switch, optionally name it and add power + voltage sensors. Tap a plug tile to toggle. Empty slots are hidden.'),
+      picker('plug_1_entity', 'Plug 1', true), textField('plug_1_name', 'Plug 1 — name'), picker('plug_1_power', 'Plug 1 — power', true), picker('plug_1_voltage', 'Plug 1 — voltage', true),
+      picker('plug_2_entity', 'Plug 2', true), textField('plug_2_name', 'Plug 2 — name'), picker('plug_2_power', 'Plug 2 — power', true), picker('plug_2_voltage', 'Plug 2 — voltage', true),
+      picker('plug_3_entity', 'Plug 3', true), textField('plug_3_name', 'Plug 3 — name'), picker('plug_3_power', 'Plug 3 — power', true), picker('plug_3_voltage', 'Plug 3 — voltage', true),
+      picker('plug_4_entity', 'Plug 4', true), textField('plug_4_name', 'Plug 4 — name'), picker('plug_4_power', 'Plug 4 — power', true), picker('plug_4_voltage', 'Plug 4 — voltage', true),
+      picker('plug_5_entity', 'Plug 5', true), textField('plug_5_name', 'Plug 5 — name'), picker('plug_5_power', 'Plug 5 — power', true), picker('plug_5_voltage', 'Plug 5 — voltage', true),
+      picker('plug_6_entity', 'Plug 6', true), textField('plug_6_name', 'Plug 6 — name'), picker('plug_6_power', 'Plug 6 — power', true), picker('plug_6_voltage', 'Plug 6 — voltage', true),
     ], { wide: true }));
 
     shell.appendChild(section('nav_battery', '🔋', 'Battery View', [
@@ -5557,6 +5567,9 @@ class CasaLunaEditor extends HTMLElement {
       picker('bat_remain', 'Remaining', true),
       picker('bat_cellmax', 'Cell Max', true), picker('bat_cellmin', 'Cell Min', true),
       picker('bat_temp1', 'Temp 1', true), picker('bat_temp2', 'Temp 2', true), picker('bat_mos', 'MOS Temp', true),
+      divider(),
+      divider(),
+      picker('bat_soh', 'State of Health', true), picker('bat_index', 'Battery Index', true), picker('bat_bms_version', 'BMS Version', true),
       divider(),
       picker('bat_charge_enable', 'Charging enable (switch)', true),
       picker('bat_discharge_enable', 'Discharging enable (switch)', true),
@@ -5684,7 +5697,7 @@ class CasaLunaEditor extends HTMLElement {
       picker('sys_inv_temp', 'Inverter Temp', true), picker('sys_work_mode', 'Work Mode', true),
       picker('sys_c3_status', 'C3 Status', true), picker('sys_board_temp', 'Board Temp', true),
       picker('sys_gas', 'Gas Level', true), picker('sys_lux', 'Light Level', true),
-      picker('sys_wifi', 'WiFi Signal', true), picker('sys_bluetooth', 'Bluetooth', true), picker('sys_grid_meter', 'Grid Meter', true),
+      picker('sys_wifi', 'WiFi Signal', true), picker('sys_bluetooth', 'Bluetooth', true), picker('sys_running_hours', 'Running hours', true),
       picker('sys_cpu', 'CPU', true), picker('sys_memory', 'Memory', true),
       picker('sys_disk', 'Disk', true), picker('sys_uptime', 'Uptime', true),
       picker('sys_core1_temp', 'Core 1 Temp', true), picker('sys_core2_temp', 'Core 2 Temp', true),
