@@ -680,7 +680,7 @@ class CasaLuna extends HTMLElement {
       inverter_output_power: '',
       inv_l1_volt: '', inv_l2_volt: '', inv_l3_volt: '',
       /* ── SECURITY view ── (real entities pre-filled; slots empty for later) */
-      sec_cam1: '', sec_cam2: '',
+      sec_cam1: '', sec_cam2: '', sec_cam3: '', sec_cam4: '',
       sec_flame: '', sec_gas_analog: '',
       sec_gas_digital: '', sec_motion: '',
       sec_door1: '', sec_window1: '',
@@ -2964,7 +2964,7 @@ class CasaLuna extends HTMLElement {
     /* auto-discover: all cameras + safety binary_sensors */
     if (this._autoOn('security')) {
       return this._wHead('Cameras')
-        + this._wCameras([['Front — Cam 1', c.sec_cam1 || ''], ['Gate — Cam 2', c.sec_cam2 || '']])
+        + this._wCameras([['Front — Cam 1', c.sec_cam1 || ''], ['Gate — Cam 2', c.sec_cam2 || ''], ['Cam 3', c.sec_cam3 || ''], ['Cam 4', c.sec_cam4 || '']])
         + this._wHead('Safety Sensors (auto)')
         + this._discoverTiles([{ domain: 'binary_sensor', device_class: ['gas', 'smoke', 'carbon_monoxide', 'safety'] }], 4, () => '🔥')
         + this._wHead('Motion & Doors (auto)')
@@ -2994,6 +2994,8 @@ class CasaLuna extends HTMLElement {
     return this._wCameras([
       ['Front — Cam 1', c.sec_cam1 || ''],
       ['Gate — Cam 2', c.sec_cam2 || ''],
+      ['Cam 3', c.sec_cam3 || ''],
+      ['Cam 4', c.sec_cam4 || ''],
     ])
       + grp('Safety Sensors', safety ? this._wGrid(4, safety) : '')
       + grp('Doors & Windows', doors ? this._wGrid(2, doors) : '')
@@ -3638,7 +3640,7 @@ class CasaLuna extends HTMLElement {
       return dim;
     }
     if (role === 'cam') {
-      const cams = [c.sec_cam1, c.sec_cam2].filter(Boolean);
+      const cams = [c.sec_cam1, c.sec_cam2, c.sec_cam3, c.sec_cam4].filter(Boolean);
       if (!cams.length) return dim;
       const states = cams.map(id => String(this._st(id) ?? '').toLowerCase());
       if (states.some(s => ['streaming', 'recording', 'idle', 'on'].includes(s))) return '#39d353';
@@ -5524,6 +5526,8 @@ class CasaLunaEditor extends HTMLElement {
       textField('camera_stream_base', 'go2rtc base URL (optional — for lower-latency WebRTC)', 'http://192.168.3.109:1984'),
       picker('sec_cam1', 'Camera 1 (Front)', true),
       picker('sec_cam2', 'Camera 2 (Gate)', true),
+      picker('sec_cam3', 'Camera 3', true),
+      picker('sec_cam4', 'Camera 4', true),
     ]));
 
     shell.appendChild(section('nav_energy', '⚡', 'Energy View', [
