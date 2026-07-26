@@ -4933,10 +4933,7 @@ class CasaLunaEditor extends HTMLElement {
 
     const style = `<style>
       :host{display:block;font-family:var(--paper-font-body1_-_font-family,inherit)}
-      .ed-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));column-gap:16px;align-items:start}
-      .ed-grid > .section{grid-column:auto}
-      .ed-grid > .section.wide{grid-column:1 / -1}
-      @media (max-width:760px){ .ed-grid{display:block} }
+      .ed-grid{display:block;max-width:100%;box-sizing:border-box}
       .section{margin-bottom:14px;border:1px solid var(--divider-color,rgba(0,0,0,.12));border-radius:10px;overflow:hidden}
       .hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--secondary-background-color,rgba(0,0,0,.04));
         font-size:.82rem;font-weight:650;letter-spacing:.4px;text-transform:uppercase;color:var(--secondary-text-color);cursor:pointer;user-select:none}
@@ -4985,7 +4982,7 @@ class CasaLunaEditor extends HTMLElement {
       if (this._sectionOpen[id] === undefined) this._sectionOpen[id] = (id === 'general');
       const open = this._sectionOpen[id];
       const sec = document.createElement('div');
-      sec.className = opts.sub ? 'sub' : (opts.wide ? 'section wide' : 'section');
+      sec.className = opts.sub ? 'sub' : 'section';
       sec.dataset.sec = id;
       const hdr = document.createElement('div');
       hdr.className = 'hdr';
@@ -5221,7 +5218,7 @@ class CasaLunaEditor extends HTMLElement {
 
     /* advanced toggle banner (spans both columns) */
     const advBanner = document.createElement('div');
-    advBanner.className = 'section wide';
+    advBanner.className = 'section';
     advBanner.style.cssText = 'margin-bottom:14px';
     const advHdr = document.createElement('div');
     advHdr.className = 'hdr';
