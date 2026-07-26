@@ -448,8 +448,8 @@ const LANG = {
 /* ── canonical geometry (measured from template, scaled 1536→1500) ── */
 const SL = {
   nav:  { x:20, w:211, h:77, tops:[146,229,312,395,478,561,644,727,810] },
-  r_cyl:[1113,92,152,288], r_stats:[1275,162,208,237], r_mode:[1275,25,208,130],
-  r_pvtile:[1113,410,369,50], r_ev:[1113,462,369,50], r_cons:[1113,513,369,123], r_prod:[1113,638,369,123], r_events:[1113,763,369,141],
+  r_cyl:[1113,123,152,288], r_stats:[1275,175,208,237], r_mode:[1275,25,208,140],
+  r_pvtile:[1113,420,369,50], r_ev:[1113,462,369,50], r_cons:[1113,513,369,123], r_prod:[1113,638,369,123], r_events:[1113,763,369,141],
   pv:[323,575,360,33], pwr:[720,575,355,33],
   stat_cont:[297,619,799,131],
   stat:{ y:630,h:107,w:180,xs:[309,508,707,906] },
@@ -2050,7 +2050,7 @@ class CasaLuna extends HTMLElement {
          Arrow at R: one dash RIGHT ►
          Colour: khan-skycard exactly — importing=#e07800 orange, exporting=#39ff14 green
     */
-    const A_Y    = SL.r_stats[1] + 38 + 3 * 46 + 9 + 20;  // 367 (base)
+    const A_Y    = SL.r_stats[1] + 38 + 3 * 46 + 9 + 20;  // 380 (base)
     const H_DASH = 13.5, H_GAP = 6, H_CYC = H_DASH + H_GAP;  // 19.5
     const V_DASH = 4,    V_GAP = 6, V_CYC = V_DASH + V_GAP;  // 10
     const CR     = 15;
