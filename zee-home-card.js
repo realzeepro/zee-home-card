@@ -456,7 +456,7 @@ const SL = {
   inv_box:[299,762,209,136],
   inv_right:[509,762,585,136],
   donut_c:[556,786,87,106],
-  invt:{ y:781,h:107,w:122,xs:[620,770,920] },
+  invt:{ y:781,h:107,w:122,xs:[650,800,950] },
   bot:{ y:917,h:75,w:182,xs:[156,357,558,759,960,1161] },
   icons:{ x:1110, y:20 },
   arc:{ lx:413,ly:205, px:735,py:150, rx:1057,ry:205 },
@@ -624,6 +624,7 @@ class CasaLuna extends HTMLElement {
       battery_min_cell: '',
       battery_max_cell: '',
       inv_temp: '',
+      inv_rad_temp: '',
       batt_dis: '',
       battery2_soc: '', battery2_power: '', battery2_current: '',
       battery2_voltage: '', battery2_mos: '',
@@ -1728,11 +1729,10 @@ class CasaLuna extends HTMLElement {
     const IB = SL.inv_box, IR = SL.inv_right, DC = SL.donut_c;
     const statCont = `<div class="box" style="left:${SC[0]}px;top:${SC[1]}px;width:${SC[2]}px;height:${SC[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35))"></div>`;
     /* when the phase tile is hidden, the inv_right box widens to fill the
-       vacated space. The INV LOAD donut and labels shift left to re-centre. */
+       vacated space. The INV LOAD donut and labels shift far left. */
     const irX = c._show_phase ? IR[0] : IB[0];
     const irW = IR[2] + (IR[0] - irX);
-    const dcSvgLeft = c._show_phase ? (DC[0] - irX - 10) : 130;
-    const nameLeft = c._show_phase ? 14 : (dcSvgLeft + 130);
+    const dcSvgLeft = c._show_phase ? (DC[0] - irX - 10) : 24;
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1756,10 +1756,10 @@ class CasaLuna extends HTMLElement {
         </div>
       </div>
     </div>
-    <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35))">
-      <svg style="position:absolute;left:${dcSvgLeft}px;top:${(IR[3]-115)/2}px;width:115px;height:115px" viewBox="0 0 115 115">
+    <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;overflow:hidden;background:var(--cl-box-bg,rgba(0,0,0,.35))">
+      <svg style="position:absolute;left:${dcSvgLeft}px;top:6px;width:80px;height:80px" viewBox="0 0 115 115">
         ${(() => {
-          const cx = 57.5, cy = 57.5, r = 44, sw = 6.1;
+          const cx = 57.5, cy = 57.5, r = 40, sw = 5.5;
           const nBlk = 6, gapDeg = 12;
           const blkDeg = (360 / nBlk) - gapDeg;
           const polar = (ang) => { const a = (ang - 90) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
@@ -1779,10 +1779,11 @@ class CasaLuna extends HTMLElement {
         <text x="57.5" y="48" font-size="14" fill="#a8cae6" text-anchor="middle">${this._t("INV LOAD")}</text>
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
-      <div class="val" style="position:absolute;left:${nameLeft}px;top:10px;font-size:10px">${esc(c.inverter_name || 'GOODWE')}</div>
-      <div style="position:absolute;left:${nameLeft}px;bottom:6px;width:162px;display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-        <span id="invStatus" style="font-size:11px;color:#a8cae6;white-space:nowrap">--</span>
-        <span id="invErr" style="font-size:11px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      <div style="position:absolute;left:${dcSvgLeft}px;top:89px;width:80px;display:flex;flex-direction:column;align-items:center;gap:1px;overflow:hidden">
+        <div class="val" style="font-size:10px;text-align:center;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">${esc(c.inverter_name || 'GOODWE')}</div>
+        <span id="invStatus" style="font-size:10px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">--</span>
+        <span id="invRadTemp" style="font-size:10px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%"></span>
+        <span id="invErr" style="font-size:10px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%"></span>
       </div>
     </div>`;
 
@@ -4085,6 +4086,8 @@ class CasaLuna extends HTMLElement {
     /* inverter */
     const invT = this._num(c.inv_temp, NaN);
     this._setTxt('#invStatus', Number.isFinite(invT) ? `Temp: ${this._decEnt(c.inv_temp)} °C` : 'Operating');
+    const radT = c.inv_rad_temp ? this._num(c.inv_rad_temp, NaN) : NaN;
+    this._setTxt('#invRadTemp', Number.isFinite(radT) ? `Rad Temp: ${this._decEnt(c.inv_rad_temp)} °C` : '');
     const invErrSt = c.inverter_error ? this._st(c.inverter_error) : '';
     const errEl = this._q('#invErr');
     if (errEl) {
@@ -5385,6 +5388,7 @@ class CasaLunaEditor extends HTMLElement {
     shell.appendChild(section('inverter', '🔄', 'Inverter Status', [
       egL('inverter_state', 'INV STATE'),
       eg('inv_temp', 'INVERTER TEMP'),
+      eg('inv_rad_temp', 'RADIATOR TEMP'),
       eg('inverter_error', 'INVERTER ERROR'),
     ]));
 
