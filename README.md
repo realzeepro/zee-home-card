@@ -77,13 +77,42 @@ title: 'ZEE HOME'
 
 ---
 
-## Visual Overview
+## Features
 
-- **Main Dashboard:** Grid ↔ Battery ↔ PV animated flow diagram with live power values
-- **Nav Views:** Energy, Smart Plugs, Battery, Climate, Security, Lighting, Automation, System, Recent Events
-- **Weather Sky:** Auto-switches between 14 backgrounds (clear/cloudy/rainy/snow/thunder + day/night/dawn/dusk) based on your HA weather entity
-- **Battery Flip Tile:** Tap to toggle between live stats (front) and PV string details (back) — pure show/hide, no CSS 3D transforms
-- **Energy Charts:** History graphs for daily load, PV production, battery charge/discharge, and grid import/export
+### Main Dashboard
+- Animated energy flow lines (battery↔home, grid↔home) with live power/voltage labels
+- Sun/moon arc + star field + 14 weather-reactive sky backgrounds with rain/snow/fog particles
+- Battery cylinder with SOC color + tap-flip tile (stats ↔ 6 PV strings)
+- 3-phase grid ↔ inverter flip tile
+- EV charging banner (W, A, SOC, ETA)
+- PV power/voltage tile, production/consumption history charts
+- 6 configurable bottom tiles with animated room-card popups
+- Recent events feed
+- Header status icons: WiFi, power menu (restart/reboot/shutdown), Bluetooth, camera
+- **Top-row stat tiles:** LOAD (W | V), GRID (W | V), BATTERY (W | V), CHG / DIS (energy today)
+- **Bottom row:** Phase/Inverter flip tile, INV LOAD donut gauge + inverter name/status, TOTAL IMP / TOTAL EXP / TOTAL PV summary tiles
+
+### 9 Nav Views (tap left rail to open)
+
+1. **Energy** — live power grid + inverter controls (EMS mode, export limit, backup, DOD, SoC protection sliders, grid switch, sync)
+2. **Smart Plugs** — up to 6 plug toggles with power + voltage readout
+3. **Battery** — Pack metrics (SoC, SOH, Index, BMS Ver, cell min/max, temps) + charge/discharge/force-charge toggles + SoC limit slider
+4. **Climate** — AC card (temp steppers, mode/fan/swing chips, eco) + fridge + ambient sensors + extra slots
+5. **Security** — 4 camera streams + safety sensors + doors + alarm scenes + motion alert
+6. **Automation** — scenes + 4 relays + 6 extra toggles + automations toggles + Alexa + Tuya timers
+7. **Lighting** — individual lights with brightness sliders + all-on/off + adaptive
+8. **System** — inverter temp/mode/running hours + server CPU/memory/disk/uptime + core temps + network stats
+9. **Dashboard** — returns to main view
+
+### Other Features
+- 15 languages (auto-detected from HA)
+- Visual editor with 24 config sections
+- Demo mode (mock data for testing)
+- Calendar popup (tap clock) with event dots
+- Camera fullscreen viewer
+- Collapsible panels, pause-on-idle, edge dim overlay
+- Shadow DOM isolated, scales to any screen width
+- Auto-discovery per view for climate/security/lighting/automation entities
 
 ---
 
@@ -297,8 +326,8 @@ Network speed values are displayed in auto-scaled units (KB/s → MB/s → GB/s)
 | Weather & Sun | Weather entity, sun entity |
 | Solar | PV strings 1–6 |
 | Grid | 3-phase breakdown |
-| Phase / Inverter Tile | Inverter output power |
-| Battery | Secondary battery |
+| Phase / Inverter Tile | 3-phase grid + inverter flip tile |
+| Battery | Primary & secondary battery |
 | Inverter | State, error, temp |
 | Energy Today | Daily + lifetime energy |
 | EV / Car Charger | — |
@@ -328,6 +357,10 @@ Network speed values are displayed in auto-scaled units (KB/s → MB/s → GB/s)
 - Attribution DRM from the original Casa Luna has been removed.
 - Custom element names: `zee-home-card` and `zee-home-card-editor`.
 - `background_path` defaults to `https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky` so sky images load via HACS without manual folder copy. Set to a local path for offline use.
+- `.detail` nav modal: percentage-centered (`left:18%; width:64%; height:84%`) with fade-in animation
+- Camera grid CSS: `display:grid; grid-template-columns:1fr 1fr; gap:12px` with `.pw-cam` at `min-height:130px` (2 per row)
+- Visual editor uses a single-column block layout
+- Heavy Load formula: `max(houseLoad - backupLoad, 0)` — reads `en_load` and `en_backup` only
 
 ---
 
@@ -351,4 +384,4 @@ Network speed values are displayed in auto-scaled units (KB/s → MB/s → GB/s)
 
 ---
 
-*Zee Home Card v1.1.0 — forked from Casa Luna by The Khan*
+*Zee Home Card v1.2.0 — forked from Casa Luna by The Khan*

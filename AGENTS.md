@@ -10,8 +10,33 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 - **9 nav views**: security, climate, energy, plugs, battery, automation, lighting, system, dashboard
 - **Config defaults** at line ~640, editor at line ~5200
 - **A_Y flow-line constant** (line ~2053) auto-calculated from `SL.r_stats[1]`
+- `.detail` nav modal: percentage-centered (`left:18%; width:64%; height:84%`) with fade-in animation
+- Camera grid CSS: `display:grid; grid-template-columns:1fr 1fr; gap:12px` with `.pw-cam` at `min-height:130px`
+- Visual editor: single-column block layout
+- Heavy Load formula: `max(houseLoad - backupLoad, 0)` — reads `en_load` and `en_backup` only
 
 ## Recent Changes (commits on main)
+
+### Top-Row Stat Tiles — redesigned as Power + Voltage
+- **LOAD** (id=`load`): shows `consump` power (W) + `grid_voltage` (V) — blue glow
+- **GRID** (id=`grid`, was `gimp`): shows `grid_active_power` (W) + `grid_voltage` (V) — orange glow. Label `c.label_grid || 'GRID'`
+- **BATTERY** (id=`batt`, was `gexp`): shows `battery_power` (W) + `battery_voltage` (V) — green glow. Label `c.label_battery || 'BATTERY'`
+- **CHG/DIS** (id=`chgdis`, unchanged): shows `today_batt_chg` / `batt_dis` (kWh)
+- Each tile now displays two values side by side: power and voltage separated by `|`
+- Added `_fmtVoltage(id)` helper for consistent voltage formatting
+- Tap handler updated: `grid` → `grid_active_power`, `batt` → `battery_power`
+- New config keys: `label_grid`, `label_battery` (with editor entries)
+- Voltage fallback entities: `grid_voltage` (LOAD/GRID), `battery_voltage` (BATTERY)
+
+### EMS Box Removed — INV LOAD shifted left
+- **EMS MODE + OPERATION box** (conditional block when `_show_phase=false`) deleted entirely
+- `irShift` variable removed; donut and labels position via `dcSvgLeft` / `nameLeft`
+- When phase tile hidden, `inv_right` expands left and the donut/gauge/labels shift into the freed space
+- Donut SVG left = 130px from box edge when expanded (vs 37px when not)
+- Name/status start at `dcSvgLeft + 130` when expanded
+
+### Summary Tiles — spread wider
+- `SL.invt.xs` changed from `[687, 823, 959]` to `[620, 770, 920]`
 
 ### Layout — Right-side control panel
 - **SL.r_mode**: `[1275, 25, 208, 130]` (height increased to fix INV STATE clipping)
@@ -58,6 +83,42 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 
 ## Editor Sections (line ~5200)
 Each nav view has its own section in the visual editor. Entity pickers use `picker(key, label)` helper. Sections: General, Toggles, Weather, Solar, Grid, Phase/Inverter, Battery, Inverter, Energy Today, EV, Bottom Tiles, Thresholds, Appearance, Text Sizes, Cameras, Energy View, Smart Plugs View, Battery View, Climate View, Security View, Automation View, Lighting View, Recent Events, System View, Testing.
+
+## Full Feature Catalog
+
+### Main Dashboard
+- Animated energy flow lines (battery↔home, grid↔home) with live power/voltage labels moving along SVG paths
+- Sun/moon arc across the sky + star field + 14 weather-reactive sky backgrounds with rain/snow/fog particle effects
+- Battery cylinder visualization with SOC color gradient + tap-flip tile (stats front ↔ 6 PV strings back)
+- 3-phase grid ↔ inverter flip tile (tap to toggle)
+- EV charging banner (power W, current A, SOC %, ETA)
+- PV power/voltage tile, production/consumption history bar charts
+- 6 configurable bottom tiles with animated room-card popups (tap to expand)
+- Recent events feed (scrollable)
+- Header status icons: WiFi signal, power menu (restart/reboot/shutdown), Bluetooth, camera snapshot trigger
+
+### 9 Nav Views (tap left rail to open)
+
+1. **Energy** — Live power grid diagram + inverter controls: EMS mode selector, export limit slider, backup reserve, DOD, SoC protection, grid switch, sync toggles
+2. **Smart Plugs** — Up to 6 plug toggle tiles with name, power (W), voltage (V) — orange voltage readout
+3. **Battery** — Pack metrics grid: SoC, SOH, Index, BMS Ver, cell min/max voltages, temperatures, cycle count + charge/discharge/force-charge toggles + SoC limit slider
+4. **Climate** — AC card: target temp steppers, mode/fan/swing chip selectors, eco toggle + fridge temp + ambient temp/humidity sensors + 6 extra entity slots
+5. **Security** — 4 camera streams (2×2 grid) + safety sensors (smoke, gas, water, motion) + door/window sensors + alarm scene buttons + motion alert toggle
+6. **Automation** — Scene buttons + 4 relay toggles + 6 extra entity toggles + automations group (Alexa routines, Tuya timers, etc.)
+7. **Lighting** — Individual light cards with brightness sliders + all-on/all-off + adaptive lighting toggle
+8. **System** — Inverter section: temp, board temp, mode, running hours + Server section: CPU/Memory/Disk/Uptime row, Core temps row, Network stats row (ETH0/WLAN0 RX/TX auto-scaled)
+9. **Dashboard** — Returns to main dashboard view
+
+### Other Capabilities
+- 15 languages (auto-detected from HA `language` setting, overridable via `language` config key)
+- Visual editor with 24 config sections (General through Testing)
+- Demo mode (mock entities for layout testing without live hardware)
+- Calendar popup (tap clock in header) with event dots
+- Camera fullscreen viewer (tap camera to expand)
+- Collapsible panels, pause-on-idle, edge dim overlay
+- Shadow DOM isolation — no theme CSS leakage
+- Auto-scales to any screen width (viewBox 1500×1000, SVG viewport)
+- Auto-discovery per view for climate/security/lighting/automation entities (when `auto_discover_<view>: true`)
 
 ## CSS Classes for Popup Widgets
 - `.pw` — control row (flex, toggle, slider)

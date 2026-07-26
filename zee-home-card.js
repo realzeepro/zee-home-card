@@ -456,7 +456,7 @@ const SL = {
   inv_box:[299,762,209,136],
   inv_right:[509,762,585,136],
   donut_c:[556,786,87,106],
-  invt:{ y:781,h:107,w:122,xs:[687,823,959] },
+  invt:{ y:781,h:107,w:122,xs:[620,770,920] },
   bot:{ y:917,h:75,w:182,xs:[156,357,558,759,960,1161] },
   icons:{ x:1110, y:20 },
   arc:{ lx:413,ly:205, px:735,py:150, rx:1057,ry:205 },
@@ -759,6 +759,7 @@ class CasaLuna extends HTMLElement {
       sz_bottile_label: 12, sz_bottile_value: 15,
       sz_totals_value: 16, sz_invload: 22,
       /* —— per-entity labels (customizable via ✏️ in each section) —— */
+      label_grid: 'GRID', label_battery: 'BATTERY',
       label_grid_import_today: 'GRID IMPORT', label_grid_export_energy: 'GRID EXPORT',
       label_consump: 'LOAD',
       label_total_pv: 'TOTAL PV', label_inverter_state: 'INV STATE',
@@ -1135,6 +1136,15 @@ class CasaLuna extends HTMLElement {
     }
     if (Number.isFinite(num)) return this._dec(s.state) + (unit ? ' ' + unit : '');  // other numeric → value+own unit
     return String(s.state);                            // text state → show as-is
+  }
+  _fmtVoltage(id) {
+    if (!id) return '--';
+    const s = this._stateObj(id);
+    if (!s || s.state === 'unavailable' || s.state === 'unknown' || s.state === '') return '--';
+    const num = parseFloat(s.state);
+    if (!Number.isFinite(num)) return String(s.state);
+    const unit = (s.attributes?.unit_of_measurement || '').trim().toLowerCase();
+    return Number.isFinite(num) ? `${this._dec(num)}${unit === 'v' ? ' V' : unit ? ' ' + unit : ''}` : '--';
   }
   _kwhEnt(id) {
     const s = this._stateObj(id);
@@ -1675,23 +1685,27 @@ class CasaLuna extends HTMLElement {
       </div>`;
     };
 
-    /* stat tiles — match inverter 3-tile order: label (top) / icon (mid) / value (bottom) */
+    /* stat tiles — label (top) / icon (mid) / power + voltage (bottom) */
     const STAT_GLOW = ['56,140,255', '255,120,40', '60,210,90', '60,255,140'];
     const statDefs = [
-      ['load', c.label_consump || c.label_load || 'LOAD', 'home'],
-      ['gimp', c.label_grid_import_today || 'GRID IMP', 'plug'],
-      ['gexp', c.label_grid_export_energy || 'GRID EXP', 'bolt'],
+      { id:'load', lbl: c.label_consump || c.label_load || 'LOAD', ik:'home', pKey:'consump', vKey:'grid_voltage' },
+      { id:'grid', lbl: c.label_grid || 'GRID', ik:'plug', pKey:'grid_active_power', vKey:'grid_voltage' },
+      { id:'batt', lbl: c.label_battery || 'BATTERY', ik:'batt', pKey:'battery_power', vKey:'battery_voltage' },
     ];
     const statRowCalc = (h) => ({ r1: Math.round(h * 1 / 6), r2: Math.round(h * 3 / 6), r3: Math.round(h * 5 / 6) });
-    const stats = statDefs.map(([id, lbl, ik], k) => {
+    const stats = statDefs.map((td, k) => {
       const x = SL.stat.xs[k], { y, w, h } = SL.stat;
       const g = STAT_GLOW[k];
       const { r1, r2, r3 } = statRowCalc(h); const iconSz = 36;
-      return `<div class="box tap stattile" data-stat="${id}"
+      return `<div class="box tap stattile" data-stat="${td.id}"
         style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:transparent;box-shadow:${glowShadow(g)}">
-        <div class="lbl" style="position:absolute;left:0;top:${r1 - 7}px;width:100%;text-align:center;font-size:${Number(c.sz_tile_label) || 11}px;letter-spacing:.05em">${esc(lbl)}</div>
-        <div style="position:absolute;left:0;top:${r2 - iconSz / 2}px;width:100%;display:flex;justify-content:center;align-items:center">${icon(ik, iconSz)}</div>
-        <div class="val val-fit" id="v_${id}" style="position:absolute;left:0;top:${r3 - 11}px;width:100%;text-align:center;font-size:${Number(c.sz_tile_value) || 21}px;padding:0 4px">--</div>
+        <div class="lbl" style="position:absolute;left:0;top:${r1 - 7}px;width:100%;text-align:center;font-size:${Number(c.sz_tile_label) || 11}px;letter-spacing:.05em">${esc(td.lbl)}</div>
+        <div style="position:absolute;left:0;top:${r2 - iconSz / 2}px;width:100%;display:flex;justify-content:center;align-items:center">${icon(td.ik, iconSz)}</div>
+        <div style="position:absolute;left:0;top:${r3 - 11}px;width:100%;display:flex;justify-content:center;align-items:center;gap:4px;padding:0 4px;box-sizing:border-box">
+          <span class="val val-fit" id="v_${td.id}" style="font-size:${Number(c.sz_tile_value) || 17}px;flex:1;text-align:right;white-space:nowrap">--</span>
+          <span style="color:#6f8aa6;font-size:13px;flex-shrink:0">|</span>
+          <span class="val val-fit" id="v_${td.id}_volt" style="font-size:${Number(c.sz_tile_value) || 17}px;flex:1;text-align:left;white-space:nowrap">--</span>
+        </div>
       </div>`;
     }).join('') +
     (() => {
@@ -1713,14 +1727,12 @@ class CasaLuna extends HTMLElement {
     const SC = SL.stat_cont;
     const IB = SL.inv_box, IR = SL.inv_right, DC = SL.donut_c;
     const statCont = `<div class="box" style="left:${SC[0]}px;top:${SC[1]}px;width:${SC[2]}px;height:${SC[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35))"></div>`;
-    /* when the phase tile is hidden, the GOODWE box widens to absorb the vacated
-       space instead of leaving a dead empty hole beside it. shift = how far the
-       box's left edge moved; existing content (donut, labels) gets the same
-       offset added so it stays anchored at its original screen position rather
-       than jumping. */
+    /* when the phase tile is hidden, the inv_right box widens to fill the
+       vacated space. The INV LOAD donut and labels shift left to re-centre. */
     const irX = c._show_phase ? IR[0] : IB[0];
-    const irShift = IR[0] - irX;
-    const irW = IR[2] + irShift;
+    const irW = IR[2] + (IR[0] - irX);
+    const dcSvgLeft = c._show_phase ? (DC[0] - irX - 10) : 130;
+    const nameLeft = c._show_phase ? 14 : (dcSvgLeft + 130);
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1745,15 +1757,7 @@ class CasaLuna extends HTMLElement {
       </div>
     </div>
     <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35))">
-      ${!c._show_phase ? `
-      <div style="position:absolute;left:10px;top:10px;width:${irShift - 20}px;height:${IR[3] - 20}px;border-radius:10px;
-        background:rgba(20,40,70,.5);border:1px solid rgba(150,200,255,.25);padding:9px 11px;box-sizing:border-box;overflow:hidden">
-        <div style="font-size:9.5px;color:#7fa3c4;letter-spacing:.05em">☰ ${this._t('EMS MODE')}</div>
-        <div class="val val-fit" id="goodweEmsVal" style="font-size:18px;font-weight:800;color:#39d353;margin-top:6px">--</div>
-        <div style="font-size:9px;color:#6f8aa6;letter-spacing:.04em;margin-top:8px">${this._t('OPERATION')}</div>
-        <div class="val val-fit" id="goodweOpVal" style="font-size:12px;font-weight:650;color:#a8cae6;margin-top:2px">--</div>
-      </div>` : ''}
-      <svg style="position:absolute;left:${DC[0]-irX-10}px;top:${(IR[3]-115)/2}px;width:115px;height:115px" viewBox="0 0 115 115">
+      <svg style="position:absolute;left:${dcSvgLeft}px;top:${(IR[3]-115)/2}px;width:115px;height:115px" viewBox="0 0 115 115">
         ${(() => {
           const cx = 57.5, cy = 57.5, r = 44, sw = 6.1;
           const nBlk = 6, gapDeg = 12;
@@ -1775,8 +1779,8 @@ class CasaLuna extends HTMLElement {
         <text x="57.5" y="48" font-size="14" fill="#a8cae6" text-anchor="middle">${this._t("INV LOAD")}</text>
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
-      <div class="val" style="position:absolute;left:${14+irShift}px;top:10px;font-size:10px">${esc(c.inverter_name || 'GOODWE')}</div>
-      <div style="position:absolute;left:${14+irShift}px;bottom:6px;width:162px;display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <div class="val" style="position:absolute;left:${nameLeft}px;top:10px;font-size:10px">${esc(c.inverter_name || 'GOODWE')}</div>
+      <div style="position:absolute;left:${nameLeft}px;bottom:6px;width:162px;display:flex;justify-content:space-between;align-items:baseline;gap:8px">
         <span id="invStatus" style="font-size:11px;color:#a8cae6;white-space:nowrap">--</span>
         <span id="invErr" style="font-size:11px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
       </div>
@@ -2314,8 +2318,8 @@ class CasaLuna extends HTMLElement {
       t.addEventListener('click', () => {
         const map = {
           load:  this._tileState('load').entity || c.consump,
-          gimp:  c.grid_import_today,
-          gexp:  c.grid_export_energy,
+          grid:  c.grid_active_power,
+          batt:  c.battery_power,
           chgdis: c.today_batt_chg,
         };
         const ent = map[t.dataset.stat]; if (ent) this._fireMoreInfo(ent);
@@ -4044,17 +4048,7 @@ class CasaLuna extends HTMLElement {
     this._fillBar('pv', pvW / Math.max(c.pv_max_power, 1), '#43ea13', 10);
     this._fillBar('pwr', loadW / Math.max(c.inverter_max_power, 1), '#0a8aea', 10);
 
-    /* GOODWE box EMS/Operation mode card — only present when phase tile is hidden
-       (the freed-space card). Reuses Energy View's already-configured entities. */
-    if (!c._show_phase) {
-      const emsSo = this._stateObj(c.en_ems_mode);
-      this._setTxt('#goodweEmsVal', emsSo ? (this._hass?.formatEntityState?.(emsSo) ?? this._cap(emsSo.state)) : '--');
-      const opSo = this._stateObj(c.en_op_mode);
-      this._setTxt('#goodweOpVal', opSo ? (this._hass?.formatEntityState?.(opSo) ?? this._cap(opSo.state)) : '--');
-    }
-
     /* stat tiles */
-    const loadRaw = this._num(c.consump, NaN);
     const tempColor = v => v >= c.thresh_temp_critical ? '#ff5040' : v >= c.thresh_temp_warn ? '#ffaa28' : '#46e05a';
     const cellTemp = (entId) => {
       let v = this._num(entId, NaN);
@@ -4063,21 +4057,27 @@ class CasaLuna extends HTMLElement {
       if (Number.isFinite(v) && c.cell_temp_x10) v *= 10;
       return v;
     };
-    // LOAD tile
-    const loadEl2 = this._q('#v_load');
-    if (loadEl2) {
-      if (!c.consump || !Number.isFinite(loadRaw)) {
-        loadEl2.textContent = '--';
-      } else {
-        loadEl2.textContent = this._powerEnt(c.consump);
-      }
-      loadEl2.style.color = '#50c8ff';
-    }
-    // GRID IMP / GRID EXP tiles
-    this._setTxt('#v_gimp', this._kwhEnt(c.grid_import_today));
-    this._setColor('#v_gimp', '#ffb45a');
-    this._setTxt('#v_gexp', c.grid_export_energy ? this._kwhEnt(c.grid_export_energy) : '--');
-    this._setColor('#v_gexp', '#7ce05a');
+    // LOAD tile — power | voltage
+    if (c.consump) {
+      const r = this._num(c.consump, NaN);
+      this._setTxt('#v_load', Number.isFinite(r) ? this._powerEnt(c.consump) : '--');
+    } else { this._setTxt('#v_load', '--'); }
+    this._setColor('#v_load', '#50c8ff');
+    this._setTxt('#v_load_volt', this._fmtVoltage(c.grid_voltage));
+    // GRID tile — power | voltage
+    if (c.grid_active_power) {
+      const r = this._watts(c.grid_active_power, NaN);
+      this._setTxt('#v_grid', Number.isFinite(r) ? `${this._dec(r)} W` : '--');
+    } else { this._setTxt('#v_grid', '--'); }
+    this._setColor('#v_grid', '#ffb45a');
+    this._setTxt('#v_grid_volt', this._fmtVoltage(c.grid_voltage));
+    // BATTERY tile — power | voltage
+    if (c.battery_power) {
+      const r = this._watts(c.battery_power, NaN);
+      this._setTxt('#v_batt', Number.isFinite(r) ? `${this._dec(r)} W` : '--');
+    } else { this._setTxt('#v_batt', '--'); }
+    this._setColor('#v_batt', '#7ce05a');
+    this._setTxt('#v_batt_volt', this._fmtVoltage(c.battery_voltage));
     // BATT CHG / DIS dual tile
     this._setTxt('#v_bchg', this._kwhEnt(c.today_batt_chg));
     this._setTxt('#v_bdis', this._kwhEnt(c.batt_dis));
@@ -4264,7 +4264,7 @@ class CasaLuna extends HTMLElement {
       if (ve) ve.textContent = pvV[i] ? `${this._decEnt(pvV[i])} V` : '--';
     }
     this._setTxt('#cnTotal', this._kwhEnt(c.today_load));
-    /* grid imp/exp now shown in middle tiles (#v_gimp / #v_gexp) */
+    /* grid/batt tiles updated in stat-tile block above */
     /* inverter summary tiles */
     const pvTs = this._tileState('pv');
     this._setTxt('#itImp', c.total_import ? this._kwhEnt(c.total_import) : '--');
@@ -5354,6 +5354,8 @@ class CasaLunaEditor extends HTMLElement {
       textField('label_total_exp', 'Total Export — caption', 'TOTAL EXP'),
       divider(),
       egL('consump', 'LOAD'),
+      textField('label_grid', 'GRID tile — caption', 'GRID'),
+      textField('label_battery', 'BATTERY tile — caption', 'BATTERY'),
       eg('today_load', "TODAY'S LOAD"),
       textField('label_today_consumption', "Today's Consumption — caption", "TODAY'S CONSUMPTION"),
     ]));
