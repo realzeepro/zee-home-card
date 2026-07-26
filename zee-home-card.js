@@ -1758,15 +1758,15 @@ class CasaLuna extends HTMLElement {
       </div>
     </div>
     <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;overflow:hidden;background:var(--cl-box-bg,rgba(0,0,0,.35))">
-      <!-- Name above donut -->
-      <div class="val" style="position:absolute;left:${dcSvgLeft}px;top:6px;width:70px;text-align:center;font-size:10px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.inverter_name || 'GOODWE')}</div>
-      <!-- Temps left of donut -->
-      <div style="position:absolute;left:6px;top:28px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden">
+      <!-- Name above donut, centered -->
+      <div class="val" style="position:absolute;left:${dcSvgLeft}px;top:12px;width:70px;text-align:center;font-size:10px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1">${esc(c.inverter_name || 'GOODWE')}</div>
+      <!-- Temps left of donut, vertically centred with gauge -->
+      <div style="position:absolute;left:6px;top:58px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden;line-height:1">
         <span id="invStatus" style="font-size:9px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
         <span id="invRadTemp" style="font-size:9px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
       </div>
-      <!-- Donut SVG -->
-      <svg style="position:absolute;left:${dcSvgLeft}px;top:18px;width:70px;height:70px" viewBox="0 0 115 115">
+      <!-- Donut SVG, vertically centred -->
+      <svg style="position:absolute;left:${dcSvgLeft}px;top:33px;width:70px;height:70px" viewBox="0 0 115 115">
         ${(() => {
           const cx = 57.5, cy = 57.5, r = 40, sw = 5.5;
           const nBlk = 6, gapDeg = 12;
@@ -1788,8 +1788,8 @@ class CasaLuna extends HTMLElement {
         <text x="57.5" y="48" font-size="14" fill="#a8cae6" text-anchor="middle">${this._t("INV LOAD")}</text>
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
-      <!-- Error right of donut -->
-      <span id="invErr" style="position:absolute;left:${dcSvgLeft+76}px;top:46px;font-size:9px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      <!-- Error right of donut, vertically centred with gauge -->
+      <span id="invErr" style="position:absolute;left:${dcSvgLeft+78}px;top:63px;font-size:9px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1"></span>
     </div>`;
 
     const invTileDefs = [
