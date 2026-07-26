@@ -4299,14 +4299,20 @@ class CasaLuna extends HTMLElement {
       : this._watts(c.consump);
   }
 
-  /* Heavy Load = portion of house load drawn from grid import + battery discharge.
-       Represents the power supplied by "high-power" (non-PV) sources. Derived from
-       the same signed power-flow conventions used by _gridNetW() and _updateFlows(). */
+  /* Heavy Load = non-essential inverter output, derived from conservation of power.
+       The inverter is a power node: Total PV + Grid + Battery = Essential Load + Heavy Load.
+       Rearranged: Heavy Load = Total PV + Grid + Battery - Essential Load.
+       Grid and Battery follow the signed conventions used by _gridNetW() and _updateFlows()
+       (positive = import/discharge, negative = export/charge). If the inverter integration
+       already exposes a dedicated Heavy Load entity, use that directly instead. */
   _heavyLoadW() {
     const c = this.config;
-    const gW = this._gridNetW();
-    const bP = this._watts(c.battery_power) * (c.invert_battery_power ? -1 : 1);
-    return Math.max(gW, 0) + Math.max(bP, 0);
+    const pvW = this._pvSum();
+    const gW  = this._gridNetW();
+    const bP  = this._watts(c.battery_power) * (c.invert_battery_power ? -1 : 1);
+    const loadW = this._invLoadW();
+    const totalIn = pvW + gW + bP;
+    return Math.max(totalIn - loadW, 0);   // clamp — can't have negative load
   }
 
   _updateFlows() {
