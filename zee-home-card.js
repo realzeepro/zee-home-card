@@ -1344,19 +1344,19 @@ class CasaLuna extends HTMLElement {
       text { font-family:'Segoe UI',Roboto,'Helvetica Neue',system-ui,sans-serif; }
       .navtile .val { font-size:17px; font-weight:700; letter-spacing:.04em; color:#cce4ff; }
       .stattile .val { font-family:'Segoe UI',Roboto,'Helvetica Neue',system-ui,sans-serif; }
-      /* nav slide-panel: opens from nav rail's right edge, fills the MIDDLE zone only
-         (right column stays visible). Vertical: below header → PV/PWR bar. */
-      .detail { position:absolute; left:231px; top:130px;
-        width:869px; height:768px;
+      /* nav modal: centered overlay inside the card. Clamps to viewport and scrolls
+          when content is tall. The scaler transform handles responsive sizing. */
+      .detail { position:absolute; left:10%; top:8%;
+        width:80%; height:84%;
         display:none; z-index:40;
         background:linear-gradient(135deg,rgba(12,28,52,.975),rgba(8,18,38,.985));
-        border:2px solid rgba(0,200,255,.55); border-left:none;
-        border-radius:0 16px 16px 0;
+        border:2px solid rgba(0,200,255,.55);
+        border-radius:16px;
         box-shadow:0 0 50px rgba(0,180,255,.30),inset 0 1px 0 rgba(120,210,255,.18);
-        transform-origin:left center; overflow:hidden; }
-      .detail.open { display:block; animation:clPanelIn .28s cubic-bezier(.2,.7,.3,1); }
-      @keyframes clPanelIn { from{ transform:scaleX(.02); opacity:.4 } to{ transform:scaleX(1); opacity:1 } }
-      .detail-inner { position:absolute; inset:0; overflow-y:auto; padding:18px 24px; }
+        overflow:hidden; }
+      .detail.open { display:block; animation:clFadeIn .22s ease; }
+      @keyframes clFadeIn { from{ opacity:0; transform:translateY(12px) } to{ opacity:1; transform:translateY(0) } }
+      .detail-inner { position:absolute; inset:0; overflow-y:auto; padding:18px 24px; box-sizing:border-box; }
       .detail h3 { color:#5bc8ff; font-size:22px; letter-spacing:.05em; margin-bottom:2px; }
       .detail .dsub { color:#7fa3c4; font-size:12px; margin-bottom:16px; }
       .detail .dclose { position:absolute; top:14px; right:18px; color:#a8cae6; font-size:24px;
@@ -2426,7 +2426,7 @@ class CasaLuna extends HTMLElement {
 
   _closeView() {
     const panel = this._q('#detailPanel');
-    if (panel) panel.classList.remove('open');
+    if (panel) { panel.classList.remove('open'); panel.style.height = ''; }
     this._activeView = 'dashboard';
     this._panelBusy = false;
     this.shadowRoot.querySelectorAll('.navtile').forEach(t => t.classList.remove('nav-active'));
@@ -2870,7 +2870,7 @@ class CasaLuna extends HTMLElement {
   _fitDetailPanel() {
     const panel = this._q('#detailPanel'), inner = this._q('#detailInner');
     if (!panel || !inner) return;
-    const MIN = 200, MAX = 768;
+    const MIN = 200;
     /* .detail-inner is position:absolute;inset:0, so it always stretches to match
        whatever height the panel currently has — scrollHeight just echoes that forced
        size back, never the true (possibly shorter) content height. Briefly switch it
@@ -2880,7 +2880,13 @@ class CasaLuna extends HTMLElement {
     inner.style.position = 'static';
     const natural = inner.scrollHeight;
     inner.style.position = prevPos;
-    panel.style.height = Math.max(MIN, Math.min(MAX, natural)) + 'px';
+    /* Only shrink below the CSS baseline (84%) for truly short content;
+       never force a height taller than the CSS default — overflow-y:auto
+       on .detail-inner handles scrolling for tall views. */
+    const cssH = panel.offsetHeight;
+    const target = Math.max(MIN, natural);
+    if (target < cssH) panel.style.height = target + 'px';
+    else panel.style.height = '';
   }
 
   /* generic fallback: simple entity list from view_<view>_entities */
