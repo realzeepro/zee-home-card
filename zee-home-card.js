@@ -1729,10 +1729,11 @@ class CasaLuna extends HTMLElement {
     const IB = SL.inv_box, IR = SL.inv_right, DC = SL.donut_c;
     const statCont = `<div class="box" style="left:${SC[0]}px;top:${SC[1]}px;width:${SC[2]}px;height:${SC[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35))"></div>`;
     /* when the phase tile is hidden, the inv_right box widens to fill the
-       vacated space. The INV LOAD donut and labels shift far left. */
+       vacated space. Layout: name above donut, temps left, errors right. */
     const irX = c._show_phase ? IR[0] : IB[0];
     const irW = IR[2] + (IR[0] - irX);
-    const dcSvgLeft = c._show_phase ? (DC[0] - irX - 10) : 24;
+    const dcSvgLeft = c._show_phase ? 64 : 92;
+    const tempW = dcSvgLeft - 10;
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1757,7 +1758,15 @@ class CasaLuna extends HTMLElement {
       </div>
     </div>
     <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;overflow:hidden;background:var(--cl-box-bg,rgba(0,0,0,.35))">
-      <svg style="position:absolute;left:${dcSvgLeft}px;top:6px;width:80px;height:80px" viewBox="0 0 115 115">
+      <!-- Name above donut -->
+      <div class="val" style="position:absolute;left:${dcSvgLeft}px;top:6px;width:70px;text-align:center;font-size:10px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.inverter_name || 'GOODWE')}</div>
+      <!-- Temps left of donut -->
+      <div style="position:absolute;left:6px;top:28px;width:${tempW}px;display:flex;flex-direction:column;gap:1px;overflow:hidden">
+        <span id="invStatus" style="font-size:9px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">--</span>
+        <span id="invRadTemp" style="font-size:9px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      </div>
+      <!-- Donut SVG -->
+      <svg style="position:absolute;left:${dcSvgLeft}px;top:18px;width:70px;height:70px" viewBox="0 0 115 115">
         ${(() => {
           const cx = 57.5, cy = 57.5, r = 40, sw = 5.5;
           const nBlk = 6, gapDeg = 12;
@@ -1779,12 +1788,8 @@ class CasaLuna extends HTMLElement {
         <text x="57.5" y="48" font-size="14" fill="#a8cae6" text-anchor="middle">${this._t("INV LOAD")}</text>
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
-      <div style="position:absolute;left:${dcSvgLeft}px;top:89px;width:80px;display:flex;flex-direction:column;align-items:center;gap:1px;overflow:hidden">
-        <div class="val" style="font-size:10px;text-align:center;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">${esc(c.inverter_name || 'GOODWE')}</div>
-        <span id="invStatus" style="font-size:10px;color:#a8cae6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">--</span>
-        <span id="invRadTemp" style="font-size:10px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%"></span>
-        <span id="invErr" style="font-size:10px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%"></span>
-      </div>
+      <!-- Error right of donut -->
+      <span id="invErr" style="position:absolute;left:${dcSvgLeft+76}px;top:46px;font-size:9px;color:#46e05a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
     </div>`;
 
     const invTileDefs = [

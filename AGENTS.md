@@ -39,13 +39,14 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 - `SL.invt.xs` changed from `[687, 823, 959]` to `[620, 770, 920]`
 
 ### INV LOAD Reposition — far left vertical stack
-- Donut SVG reduced from 115px to 85px, moved to top-left of inv_right box
+- Donut SVG reduced from 115px to 70px, moved to top-left of inv_right box
 - Inverter name, Radiator Temp, and error status stacked vertically below the donut (was: horizontal row to the right)
+- **Current layout**: name above donut, temps (Temp / Rad Temp) left of donut, error right of donut
 - Text container: `flex-direction:column;align-items:center` at same x as donut, `overflow:hidden` with `text-overflow:ellipsis` to prevent bleed under TOTAL IMP
-- Expanded (phase hidden): `dcSvgLeft=24` (was 130) — donut hugs the far-left edge
+- Expanded (phase hidden): `dcSvgLeft=92`; not expanded: `dcSvgLeft=64` (auto-calculated)
 - `overflow:hidden` added to inv_right box to contain all content
-- invt xs further pushed to `[650, 800, 950]` for 19px+ margin from status text
-- Temperature label: `Temp:` (inverter temp) and `Rad Temp:` (radiator temp via `inv_rad_temp`) — stacked vertically
+- invt xs further pushed to `[650, 800, 950]` for margin from status text
+- Temperature label: `Temp:` (inverter temp) and `Rad Temp:` (radiator temp via `inv_rad_temp`) — stacked vertically on the left
 
 ### Layout — Right-side control panel
 - **SL.r_mode**: `[1275, 25, 208, 130]` (height increased to fix INV STATE clipping)
