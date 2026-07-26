@@ -4325,12 +4325,10 @@ class CasaLuna extends HTMLElement {
        already exposes a dedicated Heavy Load entity, use that directly instead. */
   _heavyLoadW() {
     const c = this.config;
-    const pvW = this._pvSum();
-    const gW  = this._gridNetW();
-    const bP  = this._watts(c.battery_power) * (c.invert_battery_power ? -1 : 1);
-    const loadW = this._invLoadW();
-    const totalIn = pvW + gW + bP;
-    return Math.max(totalIn - loadW, 0);   // clamp — can't have negative load
+    const houseLoad = this._watts(c.en_load, NaN);
+    const backupLoad = this._watts(c.en_backup, NaN);
+    if (!Number.isFinite(houseLoad) || !Number.isFinite(backupLoad)) return NaN;
+    return Math.max(houseLoad - backupLoad, 0);
   }
 
   _updateFlows() {
