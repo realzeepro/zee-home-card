@@ -1,4 +1,4 @@
-# Zee Home Card
+﻿# Zee Home Card
 
 A custom Home Assistant Lovelace dashboard card forked from [Casa Luna](https://github.com/thekhan1122/casa-luna) by The Khan, customized for **Zee's** home energy setup.
 
@@ -30,7 +30,7 @@ resources:
 
 ### Sky Background Images
 
-The `sky/` folder with 14 PNG background images is **not installed by HACS** — you must place it manually:
+The `sky/` folder with 14 PNG background images is bundled in the repository and **downloaded automatically by HACS** — no manual placement needed. The expected structure after HACS installs:
 
 ```
 /config/www/community/zee-home-card/

@@ -4933,7 +4933,7 @@ class CasaLunaEditor extends HTMLElement {
 
     const style = `<style>
       :host{display:block;font-family:var(--paper-font-body1_-_font-family,inherit)}
-      .ed-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:start}
+      .ed-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));column-gap:16px;align-items:start}
       .ed-grid > .section{grid-column:auto}
       .ed-grid > .section.wide{grid-column:1 / -1}
       @media (max-width:760px){ .ed-grid{display:block} }
@@ -4948,7 +4948,7 @@ class CasaLunaEditor extends HTMLElement {
       .body{padding:12px 14px 4px}
       .sub{margin:8px 0;border:1px dashed var(--divider-color,rgba(0,0,0,.18));border-radius:8px;overflow:hidden}
       .sub .hdr{background:transparent;font-size:.75rem;padding:8px 12px}
-      .fld{display:block;position:relative;border:1px solid var(--divider-color,rgba(0,0,0,.42));border-radius:5px;
+      .fld{display:block;position:relative;border:1px solid var(--divider-color,rgba(0,0,0,.42));border-radius:5px;box-sizing:border-box;
         padding:6px 12px;background:var(--input-fill-color,var(--secondary-background-color,rgba(0,0,0,.04)));margin-bottom:12px}
       .fld label{display:block;font-size:.7rem;color:var(--secondary-text-color);margin-bottom:2px}
       .fld input{display:block;width:100%;border:none;outline:none;background:transparent;color:var(--primary-text-color);font-size:.95rem;font-family:inherit}
