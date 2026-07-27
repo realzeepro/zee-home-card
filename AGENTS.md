@@ -68,9 +68,9 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 - **SL.r_cyl**: `[1113, 123, 152, 288]`
 - **SL.r_pvtile**: `[1113, 410, 369, 50]` (shifted down to avoid overlap)
 - **SL.r_ev**: `[1113, 462, 369, 50]`
-- **SL.r_cons**: `[1113, 513, 369, 123]`
-- **SL.r_prod**: `[1113, 638, 369, 123]`
-- **SL.r_events**: `[1113, 763, 369, 141]`
+- **SL.r_cons**: `[1113, 480, 369, 123]` (shifted up to fill gap)
+- **SL.r_prod**: `[1113, 612, 369, 123]` (shifted up to fill gap)
+- **SL.r_events**: `[1113, 745, 369, 154]` (shifted up, taller)
 
 ### MODE Card (r_mode)
 - `overflow:hidden` on the box
