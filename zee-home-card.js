@@ -646,6 +646,7 @@ class CasaLuna extends HTMLElement {
       pv3_voltage: '', pv4_voltage: '', pv5_voltage: '', pv6_voltage: '',
       grid_import_today: '',
       grid_voltage: '',
+      load_voltage: '',
       _show_phase: true, grid_phase_a: '', grid_phase_b: '', grid_phase_c: '',
       grid_phase_a_volt: '', grid_phase_b_volt: '', grid_phase_c_volt: '',
       _show_battery2: false,
@@ -1693,7 +1694,7 @@ class CasaLuna extends HTMLElement {
     /* stat tiles — label (top) / icon (mid) / power + voltage (bottom) */
     const STAT_GLOW = ['56,140,255', '255,120,40', '60,210,90', '60,255,140'];
     const statDefs = [
-      { id:'load', lbl: c.label_consump || c.label_load || 'LOAD', ik:'home', pKey:'consump', vKey:'grid_voltage' },
+      { id:'load', lbl: c.label_consump || c.label_load || 'LOAD', ik:'home', pKey:'consump', vKey:'load_voltage' },
       { id:'grid', lbl: c.label_grid || 'GRID', ik:'plug', pKey:'grid_active_power', vKey:'grid_voltage' },
       { id:'batt', lbl: c.label_battery || 'BATTERY', ik:'batt', pKey:'battery_power', vKey:'battery_voltage' },
     ];
@@ -4087,7 +4088,7 @@ class CasaLuna extends HTMLElement {
       this._setTxt('#v_load', Number.isFinite(r) ? this._powerEnt(c.consump) : '--');
     } else { this._setTxt('#v_load', '--'); }
     this._setColor('#v_load', '#50c8ff');
-    this._setTxt('#v_load_volt', this._fmtVoltage(c.grid_voltage));
+    this._setTxt('#v_load_volt', this._fmtVoltage(c.load_voltage || c.grid_voltage));
     // GRID tile — power | voltage
     if (c.grid_active_power) {
       const r = this._watts(c.grid_active_power, NaN);
@@ -5380,6 +5381,7 @@ class CasaLunaEditor extends HTMLElement {
       textField('label_total_exp', 'Total Export — caption', 'TOTAL EXP'),
       divider(),
       egL('consump', 'LOAD'),
+      eg('load_voltage', 'LOAD VOLTAGE'),
       textField('label_grid', 'GRID tile — caption', 'GRID'),
       textField('label_battery', 'BATTERY tile — caption', 'BATTERY'),
       eg('today_load', "TODAY'S LOAD"),
