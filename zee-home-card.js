@@ -1708,9 +1708,9 @@ class CasaLuna extends HTMLElement {
         <div class="lbl" style="position:absolute;left:0;top:${r1 - 7}px;width:100%;text-align:center;font-size:${Number(c.sz_tile_label) || 11}px;letter-spacing:.05em">${esc(td.lbl)}</div>
         <div style="position:absolute;left:0;top:${r2 - iconSz / 2}px;width:100%;display:flex;justify-content:center;align-items:center">${icon(td.ik, iconSz)}</div>
         <div style="position:absolute;left:0;top:${r3 - 11}px;width:100%;display:flex;justify-content:center;align-items:center;gap:4px;padding:0 4px;box-sizing:border-box">
-          <span class="val val-fit" id="v_${td.id}" style="font-size:${Number(c.sz_tile_value) || 17}px;flex:1;text-align:right;white-space:nowrap">--</span>
+          <span class="val val-fit" id="v_${td.id}" style="font-size:20px;flex:1;text-align:right;white-space:nowrap">--</span>
           <span style="color:#6f8aa6;font-size:13px;flex-shrink:0">|</span>
-          <span class="val val-fit" id="v_${td.id}_volt" style="font-size:${Number(c.sz_tile_value) || 17}px;flex:1;text-align:left;white-space:nowrap">--</span>
+          <span class="val val-fit" id="v_${td.id}_volt" style="font-size:20px;flex:1;text-align:left;white-space:nowrap">--</span>
         </div>
       </div>`;
     }).join('') +
@@ -1722,9 +1722,9 @@ class CasaLuna extends HTMLElement {
         <div class="lbl" style="position:absolute;left:0;top:${r1 - 7}px;width:100%;text-align:center;font-size:${Number(c.sz_tile_label) || 11}px;letter-spacing:.05em">${c.label_chg_dis ? esc(c.label_chg_dis) : 'CHG <span style="color:#7fa3c4">/ DIS</span>'}</div>
         <div style="position:absolute;left:0;top:${r2 - iconSz / 2}px;width:100%;display:flex;justify-content:center;align-items:center">${icon('batt', iconSz)}</div>
         <div style="position:absolute;left:0;top:${r3 - 11}px;width:100%;display:flex;justify-content:center;align-items:center;gap:6px">
-          <div class="val val-fit" id="v_bchg" style="font-size:${Math.round((Number(c.sz_tile_value) || 21) * 0.68)}px;color:#7ce05a;max-width:45%;text-align:center">--</div>
+          <div class="val val-fit" id="v_bchg" style="font-size:20px;color:#7ce05a;max-width:45%;text-align:center">--</div>
           <div style="width:1px;height:16px;background:rgba(100,180,255,.35);flex-shrink:0"></div>
-          <div class="val val-fit" id="v_bdis" style="font-size:${Math.round((Number(c.sz_tile_value) || 21) * 0.68)}px;color:#ffb45a;max-width:45%;text-align:center">--</div>
+          <div class="val val-fit" id="v_bdis" style="font-size:20px;color:#ffb45a;max-width:45%;text-align:center">--</div>
         </div>
       </div>`;
     })();
