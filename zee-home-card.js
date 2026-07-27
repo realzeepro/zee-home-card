@@ -658,7 +658,7 @@ class CasaLuna extends HTMLElement {
       _extra_tile_3_enabled: true,  _extra_tile_3_label: 'Gas / Flame', _extra_tile_3_entity: '', _extra_tile_3_icon: 'flame',
       _extra_tile_4_enabled: true,  _extra_tile_4_label: 'AC',          _extra_tile_4_entity: '', _extra_tile_4_icon: 'snow',
       _extra_tile_5_enabled: true,  _extra_tile_5_label: 'Lights',      _extra_tile_5_entity: '', _extra_tile_5_icon: 'bulb',
-      _extra_tile_6_enabled: true,  _extra_tile_6_label: 'Outlet',      _extra_tile_6_entity: '', _extra_tile_6_icon: 'plug',
+      _extra_tile_6_enabled: true,  _extra_tile_6_label: 'Outlet',      _extra_tile_6_entity: '', _extra_tile_6_icon: 'plug', _extra_tile_6_power_entity: '',
       thresh_temp_warn: 40, thresh_temp_critical: 50,
       thresh_cell_v_low: 3.1, thresh_cell_v_critical: 3.0, thresh_cell_v_high: 3.65,
       thresh_soc_low: 25, thresh_soc_critical: 15,
@@ -1922,13 +1922,15 @@ class CasaLuna extends HTMLElement {
       const lbl = c[`_extra_tile_${n}_label`] || `TILE ${n}`;
       const ikName = c[`_extra_tile_${n}_icon`];
       const ik  = ICONS[ikName] ? ikName : 'gear';
+      const hasPwr = n === 6 && !!c._extra_tile_6_power_entity;
       /* fan/bulb/plug use room-card animated SVGs (currentColor-driven) */
       const iconHtml = RC_ICONS[ikName] ? `<span style="color:#7a8694;display:flex">${rcIcon(ikName, 31)}</span>` : icon(ik, 31);
       return `<div class="box tap bottile" id="bottile${n}" data-n="${n}"
         style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
         <div id="btIcon${n}" style="position:absolute;left:8px;top:10px;width:46px;height:${h - 20}px;display:flex;align-items:center;justify-content:center">${iconHtml}</div>
         <div class="val" id="btLbl${n}" style="position:absolute;left:60px;right:8px;top:13px;font-size:${Number(c.sz_bottile_label)||12}px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(lbl).toUpperCase()}</div>
-        <div class="val val-fit" id="bt${n}" style="position:absolute;left:60px;right:8px;top:35px;font-size:${Number(c.sz_bottile_value)||15}px;color:#7fd4ff">--</div>
+        <div class="val val-fit" id="bt${n}" style="position:absolute;left:60px;right:8px;top:${hasPwr?30:35}px;font-size:${Number(c.sz_bottile_value)||15}px;color:#7fd4ff">--</div>
+        ${hasPwr?`<div class="val val-fit" id="bt6pwr" style="position:absolute;left:60px;right:8px;top:49px;font-size:11px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>`:''}
       </div>`;
     }).join('');
 
@@ -4451,6 +4453,15 @@ class CasaLuna extends HTMLElement {
       let u = this._attr(id, 'unit_of_measurement') || '';
       if (!u && id.startsWith('climate.') && /^-?\\d/.test(String(st))) u = '\u00b0C';
       el.textContent = st === null ? '--' : `${st}${u ? ' ' + u : ''}`.toUpperCase().slice(0, 16);
+      /* tile 6: optional power readout */
+      if (n === 6) {
+        const pwrEl = this._q('#bt6pwr');
+        if (pwrEl) {
+          const pwrId = c._extra_tile_6_power_entity;
+          const pwrVal = pwrId ? this._watts(pwrId, NaN) : NaN;
+          pwrEl.textContent = Number.isFinite(pwrVal) ? `${pwrVal.toFixed(0)} W` : '';
+        }
+      }
       const onState = ['on', 'open', 'home', 'auto', 'heat', 'cool', 'playing', 'unlocked'].includes(String(st).toLowerCase());
       el.style.color = onState ? '#5ae06e'
         : ['off', 'closed', 'disarmed', 'locked'].includes(String(st).toLowerCase()) ? '#eaf3ff' : '#7fd4ff';
@@ -4986,7 +4997,7 @@ class CasaLunaEditor extends HTMLElement {
     this._config = { ...this._config, [key]: value };
     this._fireChanged();
     // re-render only on structural keys (toggles that show/hide content)
-    if (/^_show_|^_extra_tile_\d+_enabled$|^_extra_tile_\d+_entity$|_enabled$|battery_cap_unit|battery2_cap_unit/.test(key)) this._render();
+    if (/^_show_|^_extra_tile_\d+_enabled$|^_extra_tile_\d+_entity$|^_extra_tile_6_power_entity$|_enabled$|battery_cap_unit|battery2_cap_unit/.test(key)) this._render();
   }
 
   /* jump a section open + scroll to it (used by on-card pencil via attribute) */
@@ -5474,11 +5485,11 @@ class CasaLunaEditor extends HTMLElement {
         clr.addEventListener('click', () => this._set(`_extra_tile_${i}_entity`, ''));
         entWrap.appendChild(clr);
       }
-      bottomRows.push(section(`bottom_tile_${i}`, on ? '✅' : '⬜', `Bottom Tile ${i}`, [
-        textField(`_extra_tile_${i}_label`, 'Label text', `Tile ${i}`),
+      const extraPicks = [textField(`_extra_tile_${i}_label`, 'Label text', `Tile ${i}`),
         textField(`_extra_tile_${i}_icon`, 'Icon — animated: flame,snow,water,heat,fan,bulb,plug · static: home,bolt,batt,therm,shield,gear,sun,pump,irrig,warn'),
-        entWrap,
-      ], { sub: true, toggleKey: `_extra_tile_${i}_enabled`, toggleOn: on, hidden: !on }));
+        entWrap];
+      if (i === 6) extraPicks.push(picker('_extra_tile_6_power_entity', 'Power sensor (W)'));
+      bottomRows.push(section(`bottom_tile_${i}`, on ? '✅' : '⬜', `Bottom Tile ${i}`, extraPicks, { sub: true, toggleKey: `_extra_tile_${i}_enabled`, toggleOn: on, hidden: !on }));
     }
     shell.appendChild(section('bottom', '🎛️', 'Bottom Tiles (1–6)', bottomRows));
 
