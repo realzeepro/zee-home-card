@@ -91,7 +91,7 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 - **Battery popup** (`_viewBattery`, line ~3100): Added `bat_soh` (SOH), `bat_index` (Index), `bat_bms_version` (BMS Ver) tiles to Pack grid
 - **System popup** (`_viewSystem`, line ~3230): Replaced "Grid kWh" tile with "Running hrs" using `sys_running_hours` entity
 - **Smart Plugs popup** (`_wPlugTile`, line ~2483): Added voltage display (`#ffb45a` orange) after power watts via `plug_N_voltage` entity
-- **Security popup** (`_viewSecurity`, line ~2962): Added `sec_cam3` and `sec_cam4`; camera grid is `display:grid; grid-template-columns:repeat(2,1fr)` (2 per row)
+- **Security popup** (`_viewSecurity`, line ~2962): Added `sec_cam3` and `sec_cam4`; camera grid is `display:grid; grid-template-columns:1fr 1fr; gap:12px` with `.pw-cam` at `aspect-ratio:16/9` and `min-height:120px`; single camera spans full width; mobile collapses to 1 column at 500px
 
 ### Sky Backgrounds
 - Default `background_path`: `https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky` (GitHub raw CDN)

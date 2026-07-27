@@ -1452,13 +1452,16 @@ class CasaLuna extends HTMLElement {
       .pw-head { color:#7fb0d8; font-size:11px; font-weight:700; letter-spacing:.12em;
         text-transform:uppercase; margin:14px 0 8px; opacity:.85; }
       .pw-head:first-child { margin-top:0; }
-      /* camera tiles */
+      /* camera tiles — 2×2 grid with consistent aspect ratio */
       .pw-cams { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-      .pw-cam { min-height:130px; background:rgba(0,0,0,.55); border:1px solid rgba(0,200,255,.3);
-        border-radius:10px; overflow:hidden; position:relative; }
+      .pw-cam { aspect-ratio:16 / 9; background:rgba(0,0,0,.45); border:1px solid rgba(0,200,255,.25);
+        border-radius:12px; overflow:hidden; position:relative;
+        box-shadow:0 4px 15px rgba(0,0,0,.3),inset 0 1px 0 rgba(120,210,255,.12);
+        backdrop-filter:blur(4px); min-height:120px; }
       .pw-cam iframe { width:100%; height:100%; border:none; }
       .pw-cam .camStream { width:100%; height:100%; object-fit:cover; display:block; background:#000; }
       .pw-cam[data-cam-tap] { cursor:pointer; }
+      .pw-cam:only-child { grid-column:1 / -1; max-width:640px; justify-self:center; }
       .pw-cam .clbl { position:absolute; bottom:6px; left:8px; font-size:11px; font-weight:700;
         color:#eaf4ff; text-shadow:0 1px 3px #000; }
       .pw-cam .crec { position:absolute; top:6px; right:8px; font-size:9px; font-weight:700;
@@ -1466,6 +1469,7 @@ class CasaLuna extends HTMLElement {
       .pw-cam .crec::before { content:''; width:6px; height:6px; border-radius:50%; background:#3fb950;
         animation:clRecBlink 1.4s infinite; }
       @keyframes clRecBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+      @media (max-width:500px) { .pw-cams { grid-template-columns:1fr; } }
       /* time picker row (Tuya timer) */
       .pw-time { background:rgba(0,0,0,.3); border:1px solid rgba(120,180,255,.22); color:#eaf4ff;
         font-size:13px; border-radius:8px; padding:6px 8px; outline:none; }
@@ -2592,18 +2596,18 @@ class CasaLuna extends HTMLElement {
   /* dual camera tiles (go2rtc/WebRTC iframe streams) */
   _wCameras(cams) {
     const base = this.config.camera_stream_base || '';
-    const cells = cams.map(([label, src]) => {
-      const url = src && base ? `${base}/stream.html?src=${encodeURIComponent(src)}&mode=mse` : '';
-      const body = url
-        ? `<iframe src="${esc(url)}" allowfullscreen></iframe>`
-        : src
-          ? `<img class="camStream" data-cam-id="${esc(src)}" alt="${esc(label)}">`
-          : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#5a7a9a;font-size:12px">📷 ${esc(label)}<br>(stream not set)</div>`;
-      return `<div class="pw-cam" ${src ? `data-cam-tap="${esc(src)}" data-cam-label="${esc(label)}" data-cam-url="${esc(url)}"` : ''}>
-        ${body}
-        <div class="clbl">${esc(label)}</div><div class="crec">LIVE</div></div>`;
-    }).join('');
-    return `<div class="pw-cams">${cells}</div>`;
+    const cells = cams
+      .filter(([label, src]) => !!src)
+      .map(([label, src]) => {
+        const url = src && base ? `${base}/stream.html?src=${encodeURIComponent(src)}&mode=mse` : '';
+        const body = url
+          ? `<iframe src="${esc(url)}" allowfullscreen></iframe>`
+          : `<img class="camStream" data-cam-id="${esc(src)}" alt="${esc(label)}">`;
+        return `<div class="pw-cam" data-cam-tap="${esc(src)}" data-cam-label="${esc(label)}" data-cam-url="${esc(url)}">
+          ${body}
+          <div class="clbl">${esc(label)}</div><div class="crec">LIVE</div></div>`;
+      }).join('');
+    return cells ? `<div class="pw-cams">${cells}</div>` : '';
   }
 
   /* climate control card: current temp + target steppers + mode/fan/swing chips + eco (climate.*) */
