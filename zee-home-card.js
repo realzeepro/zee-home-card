@@ -1692,10 +1692,10 @@ class CasaLuna extends HTMLElement {
     };
 
     /* stat tiles — label (top) / icon (mid) / power + voltage (bottom) */
-    const STAT_GLOW = ['56,140,255', '255,120,40', '60,210,90', '60,255,140'];
+    const STAT_GLOW = ['255,120,40', '56,140,255', '60,210,90', '60,255,140'];
     const statDefs = [
-      { id:'load', lbl: c.label_consump || c.label_load || 'LOAD', ik:'home', pKey:'consump', vKey:'load_voltage' },
       { id:'grid', lbl: c.label_grid || 'GRID', ik:'plug', pKey:'grid_active_power', vKey:'grid_voltage' },
+      { id:'load', lbl: c.label_consump || c.label_load || 'LOAD', ik:'home', pKey:'consump', vKey:'load_voltage' },
       { id:'batt', lbl: c.label_battery || 'BATTERY', ik:'batt', pKey:'battery_power', vKey:'battery_voltage' },
     ];
     const statRowCalc = (h) => ({ r1: Math.round(h * 1 / 6), r2: Math.round(h * 3 / 6), r3: Math.round(h * 5 / 6) });
