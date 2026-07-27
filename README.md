@@ -89,7 +89,7 @@ title: 'ZEE HOME'
 - 6 configurable bottom tiles with animated room-card popups
 - Recent events feed
 - Header status icons: WiFi, power menu (restart/reboot/shutdown), Bluetooth, camera
-- **Top-row stat tiles:** LOAD (W | V), GRID (W | V), BATTERY (W | V), CHG / DIS (energy today)
+- **Top-row stat tiles:** GRID (W | V), LOAD (W | V), BATTERY (W | V), CHG / DIS (energy today) — all values at 20px
 - **Bottom row:** Phase/Inverter flip tile, INV LOAD donut gauge + inverter name/status, TOTAL IMP / TOTAL EXP / TOTAL PV summary tiles
 
 ### 9 Nav Views (tap left rail to open)
@@ -153,7 +153,8 @@ All keys are configurable through the visual editor. YAML equivalents are listed
 | Key | Default | Description |
 |---|---|---|
 | `grid_active_power` | `sensor.goodwe_active_power` | Grid active power |
-| `grid_voltage` | `''` | Grid voltage |
+| `grid_voltage` | `''` | Grid voltage (also used as fallback for LOAD voltage) |
+| `load_voltage` | `''` | LOAD voltage (separate sensor, falls back to grid_voltage) |
 | `grid_import_today` | `sensor.goodwe_today_energy_import` | Today's grid import |
 | `grid_export_energy` | `''` | Today's grid export |
 | `consump` | `sensor.goodwe_house_consumption` | House load |
@@ -280,6 +281,7 @@ Each tile (`_extra_tile_N_*`, N = 1–6) has:
 | `_extra_tile_N_label` | Free-text name |
 | `_extra_tile_N_entity` | Any entity |
 | `_extra_tile_N_icon` | Static: `home batt bolt therm shield gear sun pump irrig warn plug` · Animated: `flame snow water heat fan bulb plug` |
+| `_extra_tile_6_power_entity` *(tile 6 only)* | Power sensor (W) — shows wattage below the On/Off state |
 
 ### Nav-View Sections
 
@@ -358,7 +360,7 @@ Network speed values are displayed in auto-scaled units (KB/s → MB/s → GB/s)
 - Custom element names: `zee-home-card` and `zee-home-card-editor`.
 - `background_path` defaults to `https://raw.githubusercontent.com/realzeepro/zee-home-card/main/sky` so sky images load via HACS without manual folder copy. Set to a local path for offline use.
 - `.detail` nav modal: percentage-centered (`left:18%; width:64%; height:84%`) with fade-in animation
-- Camera grid CSS: `display:grid; grid-template-columns:1fr 1fr; gap:12px` with `.pw-cam` at `min-height:130px` (2 per row)
+- Camera grid CSS: `display:grid; grid-template-columns:1fr 1fr; gap:12px` with `.pw-cam` at `aspect-ratio:16/9` and `min-height:120px`; single camera spans full width; mobile collapses to 1 column
 - Visual editor uses a single-column block layout
 - Heavy Load formula: `max(houseLoad - backupLoad, 0)` — reads `en_load` and `en_backup` only
 

@@ -18,15 +18,16 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 ## Recent Changes (commits on main)
 
 ### Top-Row Stat Tiles — redesigned as Power + Voltage
-- **LOAD** (id=`load`): shows `consump` power (W) + `grid_voltage` (V) — blue glow
+- Order: **GRID · LOAD · BATTERY · CHG/DIS** (left to right)
 - **GRID** (id=`grid`, was `gimp`): shows `grid_active_power` (W) + `grid_voltage` (V) — orange glow. Label `c.label_grid || 'GRID'`
+- **LOAD** (id=`load`): shows `consump` power (W) + `load_voltage` (V, falls back to `grid_voltage`) — blue glow
 - **BATTERY** (id=`batt`, was `gexp`): shows `battery_power` (W) + `battery_voltage` (V) — green glow. Label `c.label_battery || 'BATTERY'`
 - **CHG/DIS** (id=`chgdis`, unchanged): shows `today_batt_chg` / `batt_dis` (kWh)
-- Each tile now displays two values side by side: power and voltage separated by `|`
+- Each tile displays two values side by side: power and voltage separated by `|`
+- All values at 20px font
 - Added `_fmtVoltage(id)` helper for consistent voltage formatting
 - Tap handler updated: `grid` → `grid_active_power`, `batt` → `battery_power`
-- New config keys: `label_grid`, `label_battery` (with editor entries)
-- Voltage fallback entities: `grid_voltage` (LOAD/GRID), `battery_voltage` (BATTERY)
+- New config keys: `label_grid`, `label_battery`, `load_voltage` (with editor entries)
 
 ### EMS Box Removed — INV LOAD shifted left
 - **EMS MODE + OPERATION box** (conditional block when `_show_phase=false`) deleted entirely
@@ -104,6 +105,8 @@ Single-file Home Assistant Lovelace custom card (`zee-home-card.js`, ~5700 lines
 - `sys_running_hours` — system popup (replaces `sys_grid_meter` in inverter view; `sys_grid_meter` still kept in defaults)
 - `plug_1_voltage` through `plug_6_voltage` — smart plugs
 - `sec_cam3`, `sec_cam4` — security popup
+- `load_voltage` — separate voltage sensor for LOAD card (falls back to `grid_voltage`)
+- `_extra_tile_6_power_entity` — power sensor (W) readout on bottom tile 6
 
 ## Editor Sections (line ~5200)
 Each nav view has its own section in the visual editor. Entity pickers use `picker(key, label)` helper. Sections: General, Toggles, Weather, Solar, Grid, Phase/Inverter, Battery, Inverter, Energy Today, EV, Bottom Tiles, Thresholds, Appearance, Text Sizes, Cameras, Energy View, Smart Plugs View, Battery View, Climate View, Security View, Automation View, Lighting View, Recent Events, System View, Testing.
