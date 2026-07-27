@@ -1739,13 +1739,13 @@ class CasaLuna extends HTMLElement {
     const gaugeSz = c._show_phase ? 70 : 120;
     const gaugeTop = c._show_phase ? 33 : 15;
     const dcSvgLeft = c._show_phase ? 64 : 100;
-    const tempW = dcSvgLeft - 10;
+    const tempW = dcSvgLeft - 31;
     const nameLeft = dcSvgLeft + Math.round((gaugeSz - 75) / 2);
     const gCenY = gaugeTop + Math.round(gaugeSz / 2);
-    const tempsTop = gCenY - 23;
+    const tempsTop = 30;
     const errLeft = dcSvgLeft + 125;
     const errMaxW = c._show_phase ? null : (SL.invt.xs[0] - irX - errLeft - 4);
-    const errTop = c._show_phase ? (gCenY + 37) : (gCenY - 10);
+    const errTop = c._show_phase ? (gCenY + 37) : 50;
     const lower = `
     <div class="box flipcard" id="phaseFlip" style="left:${IB[0]}px;top:${IB[1]}px;width:${IB[2]}px;height:${IB[3]}px;background:var(--cl-box-bg,rgba(0,0,0,.35));perspective:800px;${c._show_phase ? "" : "display:none"}">
       <div class="flipinner" id="phaseFlipInner" style="position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d">
@@ -1772,13 +1772,13 @@ class CasaLuna extends HTMLElement {
     <div class="box" style="left:${irX}px;top:${IR[1]}px;width:${irW}px;height:${IR[3]}px;overflow:hidden;background:var(--cl-box-bg,rgba(0,0,0,.35))">
       <!-- Name above gauge, centred -->
       <div class="val" style="position:absolute;left:${nameLeft}px;top:10px;width:75px;text-align:center;font-size:14px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1">${esc(c.inverter_name || 'GOODWE')}</div>
-      <!-- Temps left of gauge, vertically centred — label+value pairs -->
-      <div style="position:absolute;left:6px;top:${tempsTop}px;width:${tempW}px;display:flex;flex-direction:column;overflow:hidden;line-height:1">
-        <div style="font-size:8px;color:#7fa3c4;letter-spacing:.12em;text-transform:uppercase">TEMP</div>
-        <div class="val" id="invStatus" style="font-size:13px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">--</div>
-        <div style="height:4px"></div>
-        <div style="font-size:8px;color:#7fa3c4;letter-spacing:.12em;text-transform:uppercase">RAD TEMP</div>
-        <div class="val" id="invRadTemp" style="font-size:13px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px"></div>
+      <!-- Temps left of gauge — label+value pairs -->
+      <div style="position:absolute;left:25px;top:${tempsTop}px;width:${tempW}px;display:flex;flex-direction:column;overflow:hidden;line-height:1">
+        <div style="font-size:12px;color:#7fa3c4;letter-spacing:.12em;text-transform:uppercase">TEMP</div>
+        <div class="val" id="invStatus" style="font-size:18px;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">--</div>
+        <div style="height:10px"></div>
+        <div style="font-size:12px;color:#7fa3c4;letter-spacing:.12em;text-transform:uppercase">RAD TEMP</div>
+        <div class="val" id="invRadTemp" style="font-size:18px;color:#ffb45a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px"></div>
       </div>
       <!-- Donut SVG, vertically centred -->
       <svg style="position:absolute;left:${dcSvgLeft}px;top:${gaugeTop}px;width:${gaugeSz}px;height:${gaugeSz}px" viewBox="0 0 115 115">
@@ -1804,9 +1804,9 @@ class CasaLuna extends HTMLElement {
         <text id="donutPct" x="57.5" y="80" font-size="${Number(c.sz_invload)||22}" font-weight="800" fill="#eaf4ff" text-anchor="middle">--%</text>
       </svg>
       <!-- Status/Error — right of gauge when expanded, below when collapsed -->
-      <div style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:${errTop}px;width:75px;text-align:center`:`left:${errLeft}px;top:${errTop}px;max-width:${errMaxW}px`};line-height:1">
+      <div style="position:absolute;${c._show_phase?`left:${dcSvgLeft}px;top:${errTop}px;width:75px;text-align:center`:`left:${errLeft}px;top:${errTop}px;max-width:${errMaxW}px`};line-height:1.3">
         <div style="font-size:8px;color:#7fa3c4;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px">STATUS</div>
-        <div id="invErr" style="font-size:11px;font-weight:600;color:#46e05a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="invErr" style="font-size:11px;font-weight:600;color:#46e05a;white-space:normal;word-break:break-word;overflow:hidden"></div>
       </div>
     </div>`;
 
